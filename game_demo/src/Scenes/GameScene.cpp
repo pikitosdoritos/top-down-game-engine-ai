@@ -178,6 +178,8 @@ void GameScene::spawnEnemies(engine::GameEngine& engine)
 
 void GameScene::update(engine::GameEngine& engine, float dt)
 {
+    m_camera.apply(*engine.renderer().window());
+
     if (m_playerDead || m_victory) {
         m_endTimer -= dt;
         if (m_endTimer <= 0.f) {
