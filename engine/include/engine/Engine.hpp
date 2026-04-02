@@ -1,0 +1,27 @@
+#pragma once
+
+// Convenience header — include this in game code to pull in the full engine.
+
+#include "engine/Core/Types.hpp"
+#include "engine/Core/GameEngine.hpp"
+#include "engine/Window/Window.hpp"
+#include "engine/Input/InputManager.hpp"
+#include "engine/Scene/IScene.hpp"
+#include "engine/Scene/SceneManager.hpp"
+#include "engine/Entity/Component.hpp"
+#include "engine/Entity/Entity.hpp"
+#include "engine/Components/TransformComponent.hpp"
+#include "engine/Components/VelocityComponent.hpp"
+#include "engine/Components/HealthComponent.hpp"
+#include "engine/Components/ColliderComponent.hpp"
+#include "engine/Components/SpriteComponent.hpp"
+#include "engine/Components/AnimationComponent.hpp"
+#include "engine/Components/AIComponent.hpp"
+#include "engine/Renderer/Renderer.hpp"
+#include "engine/Collision/CollisionSystem.hpp"
+#include "engine/Camera/Camera.hpp"
+#include "engine/Tilemap/Tilemap.hpp"
+#include "engine/Audio/AudioManager.hpp"
+#include "engine/Resources/ResourceManager.hpp"
+#include "engine/UI/HealthBar.hpp"
+#include "engine/UI/Label.hpp"

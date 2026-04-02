@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -sL \"https://github.com/nlohmann/json/releases/download/v3.11.3/json.hpp\" -o \"e:/projects/top-down-game-engine-ai/third_party/nlohmann/json.hpp\")",
+      "Bash(curl -sL https://github.com/IdreesInc/Monocraft/releases/download/v3.0/Monocraft.ttf -o e:/projects/top-down-game-engine-ai/game_demo/assets/fonts/Monocraft.ttf)",
+      "Bash(grep -v \"//\")",
+      "Bash(cmake -B build -G Ninja -DCMAKE_CXX_COMPILER=C:/msys64/mingw64/bin/g++.exe -DCMAKE_C_COMPILER=C:/msys64/mingw64/bin/gcc.exe -DSFML_DIR=C:/msys64/mingw64/lib/cmake/SFML)",
+      "Bash(cmake --build build --target engine)",
+      "Bash(xargs grep:*)",
+      "Bash(cmake --build build --clean-first --target engine)",
+      "Bash(cmake --build build)"
+    ]
+  }
+}
