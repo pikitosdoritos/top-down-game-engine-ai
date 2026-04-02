@@ -55,13 +55,14 @@ void GameScene::onEnter(engine::GameEngine& engine)
     // Load character textures gracefully (if they exist)
     try { res.loadTexture("player", "assets/textures/player.png"); } catch(...) {}
     try { res.loadTexture("enemy", "assets/textures/enemy.png"); } catch(...) {}
+    try { res.loadTexture("tileset", "assets/textures/tileset.png"); } catch(...) {}
 
     // Build tilemap — procedural room, no texture required
     engine::TilesetInfo ts;
-    ts.texture    = nullptr;
+    ts.texture    = res.getTexture("tileset");
     ts.tileWidth  = 32;
     ts.tileHeight = 32;
-    ts.columns    = 1;
+    ts.columns    = 1;  // 1 column: row0=floor, row1=wall
     
     int w = 30, h = 22; // Medium
     if (g_difficulty == 0) { w = 20; h = 16; } // Easy
@@ -95,7 +96,7 @@ void GameScene::onEnter(engine::GameEngine& engine)
     m_hpLabel->setPosition({16.f, H - 60.f});
 
     m_killLabel.emplace(font, "Kills: 0", 18, sf::Color(180, 160, 100));
-    m_killLabel->setPosition({W - 130.f, 14.f});
+    m_killLabel->setPosition({16.f, H - 80.f});
 }
 
 void GameScene::onExit(engine::GameEngine& /*engine*/)
@@ -109,9 +110,19 @@ void GameScene::onExit(engine::GameEngine& /*engine*/)
 
 void GameScene::handleEvent(engine::GameEngine& engine, const sf::Event& event)
 {
-    if (const auto* kp = event.getIf<sf::Event::KeyPressed>())
+    if (const auto* kp = event.getIf<sf::Event::KeyPressed>()) {
         if (kp->code == sf::Keyboard::Key::Escape)
             engine.quit();
+        // F11: toggle fullscreen by recreating the window
+        if (kp->code == sf::Keyboard::Key::F11) {
+            static bool fs = false;
+            fs = !fs;
+            auto& w = engine.window();
+            w.create(w.width(), w.height(), "Dungeon of Despair", true, fs);
+            engine.renderer().init(w.sfWindow());
+            m_camera.setViewSize({static_cast<float>(w.width()), static_cast<float>(w.height())});
+        }
+    }
 }
 
 // ── Spawn helpers ─────────────────────────────────────────────────────────────
@@ -178,8 +189,6 @@ void GameScene::spawnEnemies(engine::GameEngine& engine)
 
 void GameScene::update(engine::GameEngine& engine, float dt)
 {
-    m_camera.apply(*engine.renderer().window());
-
     if (m_playerDead || m_victory) {
         m_endTimer -= dt;
         if (m_endTimer <= 0.f) {
@@ -201,6 +210,10 @@ void GameScene::update(engine::GameEngine& engine, float dt)
             }
         }
     }
+
+    // Push camera view to player before update so it aims correctly
+    if (m_player)
+        m_player->setCameraView(m_camera.sfView());
 
     // Update all entities (sets velocities, fires attacks etc.)
     for (auto& e : m_entities) {
