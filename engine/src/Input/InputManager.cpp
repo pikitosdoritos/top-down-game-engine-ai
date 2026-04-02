@@ -83,4 +83,9 @@ sf::Vector2f InputManager::mouseWorldPosition(const sf::RenderWindow& win) const
     return win.mapPixelToCoords(sf::Mouse::getPosition(win));
 }
 
+sf::Vector2f InputManager::mouseWorldPosition(const sf::RenderWindow& win, const sf::View& view) const
+{
+    return win.mapPixelToCoords(sf::Mouse::getPosition(win), view);
+}
+
 } // namespace engine
