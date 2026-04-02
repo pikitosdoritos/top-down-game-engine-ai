@@ -7,6 +7,7 @@
 #include "engine/Components/ColliderComponent.hpp"
 #include <cmath>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/View.hpp>
 
 using namespace engine;
 
@@ -66,7 +67,7 @@ void Player::update(GameEngine& engine, float dt)
     }
 
     handleMovement(engine);
-    handleAttack(engine, dt);
+    handleAttack(engine, dt, sf::View{}); // camera view injected by GameScene
 
     // Integrate position
     auto* tf  = getComponent<TransformComponent>();
@@ -100,7 +101,7 @@ void Player::handleMovement(GameEngine& engine)
     if (vel) vel->velocity = dir * moveSpeed;
 }
 
-void Player::handleAttack(GameEngine& engine, float dt)
+void Player::handleAttack(GameEngine& engine, float dt, const sf::View& cameraView)
 {
     m_attackCooldown -= dt;
     m_attacking = false;
@@ -116,10 +117,10 @@ void Player::handleAttack(GameEngine& engine, float dt)
     if (m_attackCooldown > 0.f) return;
 
     // Left mouse → fire projectile
-    if (engine.input().isMousePressed(sf::Mouse::Button::Left)) {
+    if (engine.input().isMouseDown(sf::Mouse::Button::Left)) {
         auto* tf = getComponent<TransformComponent>();
         if (tf) {
-            Vec2f mouse = engine.input().mouseWorldPosition(engine.window().sfWindow());
+            Vec2f mouse = engine.input().mouseWorldPosition(engine.window().sfWindow(), cameraView);
             Vec2f dir   = vecNorm(mouse - tf->position);
             m_facing = dir;
             pendingSpawns.push_back(
@@ -135,7 +136,7 @@ void Player::handleAttack(GameEngine& engine, float dt)
     if (engine.input().isKeyPressed(sf::Keyboard::Key::F)) {
         auto* tf = getComponent<TransformComponent>();
         if (tf) {
-            Vec2f mouse = engine.input().mouseWorldPosition(engine.window().sfWindow());
+            Vec2f mouse = engine.input().mouseWorldPosition(engine.window().sfWindow(), cameraView);
             m_facing = vecNorm(mouse - tf->position);
         }
         m_attackCooldown = 0.45f;
