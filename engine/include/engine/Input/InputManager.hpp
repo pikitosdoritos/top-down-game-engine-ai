@@ -4,6 +4,7 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/View.hpp>
 #include <array>
 
 namespace engine {
@@ -28,6 +29,8 @@ public:
     sf::Vector2i mousePosition(const sf::RenderWindow& win) const;
     // Mouse position mapped through the window's current view (world coords)
     sf::Vector2f mouseWorldPosition(const sf::RenderWindow& win) const;
+    // Mouse position mapped through a specific view (fixes aiming when camera view differs from window view)
+    sf::Vector2f mouseWorldPosition(const sf::RenderWindow& win, const sf::View& view) const;
 
 private:
     static constexpr int KEY_COUNT = static_cast<int>(sf::Keyboard::KeyCount);
