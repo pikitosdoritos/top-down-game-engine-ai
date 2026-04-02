@@ -23,3 +23,4 @@ target_include_directories(nlohmann_json INTERFACE
 
 add_subdirectory(engine)
 add_subdirectory(game_demo)
+ 
