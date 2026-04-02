@@ -67,7 +67,7 @@ void Player::update(GameEngine& engine, float dt)
     }
 
     handleMovement(engine);
-    handleAttack(engine, dt, sf::View{}); // camera view injected by GameScene
+    handleAttack(engine, dt, m_cameraView);
 
     // Integrate position
     auto* tf  = getComponent<TransformComponent>();
