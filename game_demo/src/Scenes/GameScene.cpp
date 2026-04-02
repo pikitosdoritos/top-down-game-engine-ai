@@ -17,6 +17,7 @@
 
 // Declared in GameOverScene.cpp — written here so GameScene can set it
 extern bool g_playerWon;
+extern int g_difficulty;
 
 using namespace engine;
 
@@ -50,6 +51,10 @@ void GameScene::onEnter(engine::GameEngine& engine)
     // Load font
     auto& res = engine.resources();
     const sf::Font& font = res.loadFont("main", "assets/fonts/Monocraft.ttf");
+    
+    // Load character textures gracefully (if they exist)
+    try { res.loadTexture("player", "assets/textures/player.png"); } catch(...) {}
+    try { res.loadTexture("enemy", "assets/textures/enemy.png"); } catch(...) {}
 
     // Build tilemap — procedural room, no texture required
     engine::TilesetInfo ts;
@@ -57,7 +62,12 @@ void GameScene::onEnter(engine::GameEngine& engine)
     ts.tileWidth  = 32;
     ts.tileHeight = 32;
     ts.columns    = 1;
-    m_tilemap.buildRoom(30, 22, 32, 32, ts, 0, 1);
+    
+    int w = 30, h = 22; // Medium
+    if (g_difficulty == 0) { w = 20; h = 16; } // Easy
+    else if (g_difficulty == 2) { w = 45; h = 35; } // Hard
+    
+    m_tilemap.buildRoom(w, h, 32, 32, ts, 0, 1);
 
     // Camera
     float W = static_cast<float>(engine.window().width());
@@ -106,9 +116,11 @@ void GameScene::handleEvent(engine::GameEngine& engine, const sf::Event& event)
 
 // ── Spawn helpers ─────────────────────────────────────────────────────────────
 
-void GameScene::spawnPlayer(engine::GameEngine& /*engine*/)
+void GameScene::spawnPlayer(engine::GameEngine& engine)
 {
-    auto p = std::make_unique<Player>();
+    const sf::Texture* ptex = engine.resources().getTexture("player");
+
+    auto p = std::make_unique<Player>(ptex);
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
@@ -117,22 +129,25 @@ void GameScene::spawnPlayer(engine::GameEngine& /*engine*/)
     m_entities.push_back(std::move(p));
 }
 
-void GameScene::spawnEnemies(engine::GameEngine& /*engine*/)
+void GameScene::spawnEnemies(engine::GameEngine& engine)
 {
-    // Spawn positions spread across the dungeon room
-    const std::vector<Vec2f> spawnPoints = {
-        {22 * 32.f, 3  * 32.f},
-        {25 * 32.f, 10 * 32.f},
-        {22 * 32.f, 18 * 32.f},
-        {15 * 32.f, 15 * 32.f},
-        {15 * 32.f, 5  * 32.f},
-        {10 * 32.f, 12 * 32.f},
-        {5  * 32.f, 15 * 32.f},
-        {5  * 32.f, 8  * 32.f},
-    };
+    const sf::Texture* etex = engine.resources().getTexture("enemy");
+
+    std::vector<engine::Vec2f> spawnPoints;
+    int count = (g_difficulty == 0) ? 4 : (g_difficulty == 1) ? 8 : 18;
+    
+    for (int i = 0; i < count; ++i) {
+        float px = 32.f * (5.f + (rand() % std::max(1, (m_tilemap.columns() - 10))));
+        float py = 32.f * (5.f + (rand() % std::max(1, (m_tilemap.rows() - 10))));
+        spawnPoints.push_back({px, py});
+    }
+
+    float hp = (g_difficulty == 0) ? 40.f : (g_difficulty == 1) ? 60.f : 100.f;
+    float spd = (g_difficulty == 0) ? 55.f : (g_difficulty == 1) ? 85.f : 130.f;
+    float dmg = (g_difficulty == 0) ? 8.f : (g_difficulty == 1) ? 12.f : 20.f;
 
     for (const auto& pos : spawnPoints) {
-        auto enemy = std::make_unique<Enemy>(pos, 60.f);
+        auto enemy = std::make_unique<Enemy>(pos, hp, etex);
 
         // Give each enemy its attack callback via AIComponent.behaviourUpdate
         // Capture m_player as raw pointer — valid for lifetime of GameScene
@@ -140,6 +155,8 @@ void GameScene::spawnEnemies(engine::GameEngine& /*engine*/)
         Player* rawPlayer = m_player;
 
         auto* ai = enemy->getComponent<AIComponent>();
+        ai->moveSpeed = spd;
+        ai->attackDamage = dmg;
         ai->behaviourUpdate = [rawPlayer, rawEnemy](
                 Entity& /*self*/, GameEngine& /*engine*/, float /*dt*/)
         {

@@ -3,6 +3,8 @@
 #include "Scenes/GameScene.hpp"
 #include "Scenes/GameOverScene.hpp"
 
+int g_difficulty = 1; // 0=Easy, 1=Medium, 2=Hard
+
 int main()
 {
     engine::EngineConfig cfg;

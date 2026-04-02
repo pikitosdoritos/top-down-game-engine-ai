@@ -2,7 +2,9 @@
 #include "engine/Entity/Entity.hpp"
 #include "engine/Core/Types.hpp"
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <memory>
 #include <vector>
 
@@ -10,7 +12,7 @@ namespace engine { class GameEngine; }
 
 class Player : public engine::Entity {
 public:
-    Player();
+    Player(const sf::Texture* tex = nullptr);
 
     void update(engine::GameEngine& engine, float dt) override;
     void render(sf::RenderWindow& window) override;
@@ -31,6 +33,8 @@ private:
 
     sf::RectangleShape m_body;
     sf::RectangleShape m_sword;
+    sf::CircleShape m_shadow;
+    sf::CircleShape m_glow;
 
     enum class State { Idle, Walk, Attack, Dead };
     State m_state          = State::Idle;
@@ -39,4 +43,5 @@ private:
     float m_attackCooldown = 0.f;
     bool  m_attacking      = false;
     engine::Vec2f m_facing {1.f, 0.f};
+    std::optional<sf::Sprite> m_sprite;
 };

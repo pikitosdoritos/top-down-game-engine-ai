@@ -6,6 +6,7 @@
 #include "engine/Components/HealthComponent.hpp"
 #include "engine/Components/ColliderComponent.hpp"
 #include <cmath>
+#include <SFML/Graphics/Texture.hpp>
 
 using namespace engine;
 
@@ -15,8 +16,13 @@ static Vec2f vecNorm(Vec2f v) {
     return l > 0.f ? Vec2f{v.x / l, v.y / l} : Vec2f{1.f, 0.f};
 }
 
-Player::Player() : Entity("player")
+Player::Player(const sf::Texture* tex) : Entity("player")
 {
+    if (tex) {
+        m_sprite.emplace(*tex);
+        m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+    }
+
     addComponent<TransformComponent>(Vec2f{0.f, 0.f});
     addComponent<VelocityComponent>();
     addComponent<HealthComponent>(100.f);
@@ -30,6 +36,15 @@ Player::Player() : Entity("player")
     m_body.setFillColor(sf::Color(70, 90, 180));
     m_body.setOutlineColor(sf::Color(140, 160, 255));
     m_body.setOutlineThickness(2.f);
+
+    m_shadow.setRadius(16.f);
+    m_shadow.setOrigin({16.f, 8.f});
+    m_shadow.setScale({1.f, 0.5f});
+    m_shadow.setFillColor(sf::Color(0, 0, 0, 120));
+
+    m_glow.setRadius(64.f);
+    m_glow.setOrigin({64.f, 64.f});
+    m_glow.setFillColor(sf::Color(80, 120, 255, 30));
 
     // Sword stub drawn in facing direction
     m_sword.setSize({20.f, 5.f});
@@ -153,8 +168,20 @@ void Player::render(sf::RenderWindow& window)
     if (!tf) return;
 
     sf::Vector2f pos = tf->position;
-    m_body.setPosition(pos);
-    window.draw(m_body);
+
+    m_shadow.setPosition({pos.x, pos.y + 16.f});
+    m_glow.setPosition(pos);
+    window.draw(m_shadow);
+    window.draw(m_glow);
+
+    if (m_sprite) {
+        m_sprite->setPosition(pos);
+        m_sprite->setColor(sf::Color::White);
+        window.draw(*m_sprite);
+    } else {
+        m_body.setPosition(pos);
+        window.draw(m_body);
+    }
 
     if (m_state != State::Dead) {
         float angle = std::atan2(m_facing.y, m_facing.x) * (180.f / 3.14159265f);

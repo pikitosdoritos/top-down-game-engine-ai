@@ -8,10 +8,17 @@
 #include <cmath>
 #include <algorithm>
 
+#include <SFML/Graphics/Texture.hpp>
+
 using namespace engine;
 
-Enemy::Enemy(Vec2f spawnPos, float hp) : Entity("enemy")
+Enemy::Enemy(Vec2f spawnPos, float hp, const sf::Texture* tex) : Entity("enemy")
 {
+    if (tex) {
+        m_sprite.emplace(*tex);
+        m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+    }
+
     auto& tf = addComponent<TransformComponent>(spawnPos);
     (void)tf;
     addComponent<VelocityComponent>();
@@ -41,6 +48,11 @@ Enemy::Enemy(Vec2f spawnPos, float hp) : Entity("enemy")
     m_body.setFillColor(sf::Color(160, 30, 30));
     m_body.setOutlineColor(sf::Color(220, 80, 80));
     m_body.setOutlineThickness(2.f);
+
+    m_shadow.setRadius(14.f);
+    m_shadow.setOrigin({14.f, 7.f});
+    m_shadow.setScale({1.f, 0.5f});
+    m_shadow.setFillColor(sf::Color(0, 0, 0, 110));
 
     // HP bar (world-space, above entity)
     m_hpBarBg.setSize({32.f, 5.f});
@@ -111,8 +123,21 @@ void Enemy::render(sf::RenderWindow& window)
 
     sf::Vector2f pos = tf->position;
 
-    m_body.setPosition(pos);
-    window.draw(m_body);
+    if (!isDead()) {
+        m_shadow.setPosition({pos.x, pos.y + 14.f});
+        window.draw(m_shadow);
+    }
+
+    if (m_sprite) {
+        m_sprite->setPosition(pos);
+        if (isDead()) m_sprite->setColor(sf::Color(80, 80, 80));
+        else if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 120, 120));
+        else m_sprite->setColor(sf::Color::White);
+        window.draw(*m_sprite);
+    } else {
+        m_body.setPosition(pos);
+        window.draw(m_body);
+    }
 
     // Draw HP bar above entity (only while alive and damaged)
     auto* hp = getComponent<HealthComponent>();

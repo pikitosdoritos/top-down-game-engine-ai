@@ -15,6 +15,11 @@ public:
     void render(engine::GameEngine& engine) override;
 
 private:
+    int m_selectedDiff = 1; // 0=Easy, 1=Medium, 2=Hard
+    std::optional<engine::Label> m_btnEasy;
+    std::optional<engine::Label> m_btnMedium;
+    std::optional<engine::Label> m_btnHard;
+
     std::optional<engine::Label> m_title;
     std::optional<engine::Label> m_subtitle;
     std::optional<engine::Label> m_prompt;

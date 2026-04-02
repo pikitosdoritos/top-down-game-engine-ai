@@ -1,0 +1,173 @@
+[1/4] Building CXX object game_demo/CMakeFiles/game_demo.dir/src/Entities/Player.cpp.obj
+FAILED: [code=1] game_demo/CMakeFiles/game_demo.dir/src/Entities/Player.cpp.obj 
+C:\msys64\mingw64\bin\g++.exe  -IE:/projects/top-down-game-engine-ai/game_demo/src -IE:/projects/top-down-game-engine-ai/engine/include -IE:/projects/top-down-game-engine-ai/third_party -g -std=c++17 -Wall -Wextra -Wpedantic -MD -MT game_demo/CMakeFiles/game_demo.dir/src/Entities/Player.cpp.obj -MF game_demo\CMakeFiles\game_demo.dir\src\Entities\Player.cpp.obj.d -o game_demo/CMakeFiles/game_demo.dir/src/Entities/Player.cpp.obj -c E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Entity.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:1:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::onAttach(engine::Entity&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:13:35: warning: unused parameter 'owner' [-Wunused-parameter]
+   13 |     virtual void onAttach(Entity& owner) {}
+      |                           ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::update(engine::Entity&, engine::GameEngine&, float)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:33: warning: unused parameter 'owner' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                         ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:52: warning: unused parameter 'engine' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                        ~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:66: warning: unused parameter 'dt' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                                            ~~~~~~^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp: At global scope:
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp:45:23: error: 'Sprite' is not a member of 'sf'
+   45 |     std::optional<sf::Sprite> m_sprite;
+      |                       ^~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp:45:29: error: template argument 1 is invalid
+   45 |     std::optional<sf::Sprite> m_sprite;
+      |                             ^
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/SceneManager.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/engine/include/engine/Core/GameEngine.hpp:4,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:3:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp: In member function 'virtual void engine::IScene::handleEvent(engine::GameEngine&, const sf::Event&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:50: warning: unused parameter 'engine' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                              ~~~~~~~~~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:75: warning: unused parameter 'event' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                                                          ~~~~~~~~~~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp: In constructor 'Player::Player(const sf::Texture*)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:22:18: error: request for member 'emplace' in '((Player*)this)->Player::m_sprite', which is of non-class type 'int'
+   22 |         m_sprite.emplace(*tex);
+      |                  ^~~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:23:17: error: base operand of '->' is not a pointer
+   23 |         m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp: In member function 'virtual void Player::render(sf::RenderWindow&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:178:17: error: base operand of '->' is not a pointer
+  178 |         m_sprite->setPosition(pos);
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:179:13: error: 'm_hurtFlash' was not declared in this scope
+  179 |         if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 120, 120));
+      |             ^~~~~~~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:179:40: error: base operand of '->' is not a pointer
+  179 |         if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 120, 120));
+      |                                        ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:180:22: error: base operand of '->' is not a pointer
+  180 |         else m_sprite->setColor(sf::Color::White);
+      |                      ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.cpp:181:21: error: invalid type argument of unary '*' (have 'int')
+  181 |         window.draw(*m_sprite);
+      |                     ^~~~~~~~~
+[2/4] Building CXX object game_demo/CMakeFiles/game_demo.dir/src/Entities/Enemy.cpp.obj
+FAILED: [code=1] game_demo/CMakeFiles/game_demo.dir/src/Entities/Enemy.cpp.obj 
+C:\msys64\mingw64\bin\g++.exe  -IE:/projects/top-down-game-engine-ai/game_demo/src -IE:/projects/top-down-game-engine-ai/engine/include -IE:/projects/top-down-game-engine-ai/third_party -g -std=c++17 -Wall -Wextra -Wpedantic -MD -MT game_demo/CMakeFiles/game_demo.dir/src/Entities/Enemy.cpp.obj -MF game_demo\CMakeFiles\game_demo.dir\src\Entities\Enemy.cpp.obj.d -o game_demo/CMakeFiles/game_demo.dir/src/Entities/Enemy.cpp.obj -c E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Entity.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:1:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::onAttach(engine::Entity&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:13:35: warning: unused parameter 'owner' [-Wunused-parameter]
+   13 |     virtual void onAttach(Entity& owner) {}
+      |                           ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::update(engine::Entity&, engine::GameEngine&, float)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:33: warning: unused parameter 'owner' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                         ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:52: warning: unused parameter 'engine' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                        ~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:66: warning: unused parameter 'dt' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                                            ~~~~~~^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.hpp: At global scope:
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.hpp:31:23: error: 'Sprite' is not a member of 'sf'
+   31 |     std::optional<sf::Sprite> m_sprite;
+      |                       ^~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.hpp:31:29: error: template argument 1 is invalid
+   31 |     std::optional<sf::Sprite> m_sprite;
+      |                             ^
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/SceneManager.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/engine/include/engine/Core/GameEngine.hpp:4,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:2:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp: In member function 'virtual void engine::IScene::handleEvent(engine::GameEngine&, const sf::Event&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:50: warning: unused parameter 'engine' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                              ~~~~~~~~~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:75: warning: unused parameter 'event' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                                                          ~~~~~~~~~~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp: In constructor 'Enemy::Enemy(engine::Vec2f, float, const sf::Texture*)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:18:18: error: request for member 'emplace' in '((Enemy*)this)->Enemy::m_sprite', which is of non-class type 'int'
+   18 |         m_sprite.emplace(*tex);
+      |                  ^~~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:19:17: error: base operand of '->' is not a pointer
+   19 |         m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp: In member function 'virtual void Enemy::render(sf::RenderWindow&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:132:17: error: base operand of '->' is not a pointer
+  132 |         m_sprite->setPosition(pos);
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:133:31: error: base operand of '->' is not a pointer
+  133 |         if (isDead()) m_sprite->setColor(sf::Color(80, 80, 80));
+      |                               ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:134:45: error: base operand of '->' is not a pointer
+  134 |         else if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 120, 120));
+      |                                             ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:135:22: error: base operand of '->' is not a pointer
+  135 |         else m_sprite->setColor(sf::Color::White);
+      |                      ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.cpp:136:21: error: invalid type argument of unary '*' (have 'int')
+  136 |         window.draw(*m_sprite);
+      |                     ^~~~~~~~~
+[3/4] Building CXX object game_demo/CMakeFiles/game_demo.dir/src/Scenes/GameScene.cpp.obj
+FAILED: [code=1] game_demo/CMakeFiles/game_demo.dir/src/Scenes/GameScene.cpp.obj 
+C:\msys64\mingw64\bin\g++.exe  -IE:/projects/top-down-game-engine-ai/game_demo/src -IE:/projects/top-down-game-engine-ai/engine/include -IE:/projects/top-down-game-engine-ai/third_party -g -std=c++17 -Wall -Wextra -Wpedantic -MD -MT game_demo/CMakeFiles/game_demo.dir/src/Scenes/GameScene.cpp.obj -MF game_demo\CMakeFiles\game_demo.dir\src\Scenes\GameScene.cpp.obj.d -o game_demo/CMakeFiles/game_demo.dir/src/Scenes/GameScene.cpp.obj -c E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp
+In file included from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp:1:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp: In member function 'virtual void engine::IScene::handleEvent(engine::GameEngine&, const sf::Event&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:50: warning: unused parameter 'engine' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                              ~~~~~~~~~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:75: warning: unused parameter 'event' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                                                          ~~~~~~~~~~~~~~~~~^~~~~
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Components/VelocityComponent.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/engine/include/engine/Collision/CollisionSystem.hpp:3,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.hpp:5:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::onAttach(engine::Entity&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:13:35: warning: unused parameter 'owner' [-Wunused-parameter]
+   13 |     virtual void onAttach(Entity& owner) {}
+      |                           ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::update(engine::Entity&, engine::GameEngine&, float)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:33: warning: unused parameter 'owner' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                         ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:52: warning: unused parameter 'engine' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                        ~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:66: warning: unused parameter 'dt' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                                            ~~~~~~^~
+In file included from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp:2:
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp: At global scope:
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp:45:23: error: 'Sprite' is not a member of 'sf'
+   45 |     std::optional<sf::Sprite> m_sprite;
+      |                       ^~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Player.hpp:45:29: error: template argument 1 is invalid
+   45 |     std::optional<sf::Sprite> m_sprite;
+      |                             ^
+In file included from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp:3:
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.hpp:31:23: error: 'Sprite' is not a member of 'sf'
+   31 |     std::optional<sf::Sprite> m_sprite;
+      |                       ^~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Enemy.hpp:31:29: error: template argument 1 is invalid
+   31 |     std::optional<sf::Sprite> m_sprite;
+      |                             ^
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp: In member function 'void GameScene::spawnPlayer(engine::GameEngine&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp:122:48: error: lvalue required as unary '&' operand
+  122 |     try { ptex = &engine.resources().getTexture("player"); } catch (...) {}
+      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp: In member function 'void GameScene::spawnEnemies(engine::GameEngine&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/GameScene.cpp:136:48: error: lvalue required as unary '&' operand
+  136 |     try { etex = &engine.resources().getTexture("enemy"); } catch (...) {}
+      |                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~
+ninja: build stopped: subcommand failed.
