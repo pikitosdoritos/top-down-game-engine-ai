@@ -46,7 +46,7 @@ void MenuScene::onEnter(engine::GameEngine& engine)
     m_btnHard->centerX(W);
     m_btnHard->setPosition({m_btnHard->sfText()->getPosition().x, H * 0.78f});
 
-    m_controls.emplace(font, "W/S: Navigate    Enter: Select    Esc: Quit", 14,
+    m_controls.emplace(font, "W/S: Navigate    Enter: Select    F11: Fullscreen    Esc: Quit", 14,
                         sf::Color(80, 70, 60));
     m_controls->centerX(W);
     m_controls->setPosition({m_controls->sfText()->getPosition().x, H * 0.92f});
