@@ -266,7 +266,8 @@ void CampaignLevelScene::handleTileCollisions()
 
         auto* tf  = e->getComponent<TransformComponent>();
         auto* col = e->getComponent<ColliderComponent>();
-        if (!tf || !col || col->isTrigger) continue;
+        if (!tf || !col) continue;
+        if (col->isTrigger && e->tag() != "projectile") continue;
 
         FloatRect eBounds = col->worldBounds(tf->position);
 
@@ -387,8 +388,9 @@ void CampaignLevelScene::spawnPlayer(engine::GameEngine& engine)
 {
     const LevelConfig& cfg = CampaignState::current();
     const sf::Texture* ptex = engine.resources().getTexture("player");
+    const sf::Texture* swordTex = engine.resources().getTexture("sword");
 
-    auto p = std::make_unique<Player>(ptex);
+    auto p = std::make_unique<Player>(ptex, swordTex);
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
@@ -444,7 +446,7 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
     // Grunts
     for (int i = 0; i < cfg.gruntCount; ++i) {
         Vec2f pos = safeSpawn(m_tilemap, cfg.mapCols, cfg.mapRows, cfg.tileSize,
-                               i * 31 + 5000 + CampaignState::get().currentLevel * 100);
+                               i * 311 + 5000 + CampaignState::get().currentLevel * 100);
 
         auto enemy = std::make_unique<Enemy>(pos, cfg.gruntHP, etex);
         auto* ai = enemy->getComponent<AIComponent>();
@@ -458,7 +460,7 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
     const sf::Texture* btex = engine.resources().getTexture("brute");
     for (int i = 0; i < cfg.bruteCount; ++i) {
         Vec2f pos = safeSpawn(m_tilemap, cfg.mapCols, cfg.mapRows, cfg.tileSize,
-                               i * 53 + 9000 + CampaignState::get().currentLevel * 200);
+                               i * 537 + 9000 + CampaignState::get().currentLevel * 200);
 
         auto brute = std::make_unique<Brute>(pos,
             cfg.bruteHP, cfg.bruteSpeed, cfg.bruteDamage, btex);

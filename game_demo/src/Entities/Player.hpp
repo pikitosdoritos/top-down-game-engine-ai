@@ -13,7 +13,7 @@ namespace engine { class GameEngine; }
 
 class Player : public engine::Entity {
 public:
-    Player(const sf::Texture* tex = nullptr);
+    Player(const sf::Texture* tex = nullptr, const sf::Texture* swordTex = nullptr);
 
     void update(engine::GameEngine& engine, float dt) override;
     void render(sf::RenderWindow& window) override;
@@ -49,4 +49,5 @@ private:
     engine::Vec2f m_facing {1.f, 0.f};
     sf::View  m_cameraView;
     std::optional<sf::Sprite> m_sprite;
+    std::optional<sf::Sprite> m_swordSprite;
 };

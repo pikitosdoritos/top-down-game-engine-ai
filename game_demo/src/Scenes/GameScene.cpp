@@ -142,8 +142,9 @@ void GameScene::handleEvent(engine::GameEngine& engine, const sf::Event& event)
 void GameScene::spawnPlayer(engine::GameEngine& engine)
 {
     const sf::Texture* ptex = engine.resources().getTexture("player");
+    const sf::Texture* swordTex = engine.resources().getTexture("sword");
 
-    auto p = std::make_unique<Player>(ptex);
+    auto p = std::make_unique<Player>(ptex, swordTex);
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
@@ -161,7 +162,7 @@ void GameScene::spawnEnemies(engine::GameEngine& engine)
     
     for (int i = 0; i < count; ++i) {
         Vec2f pos = safeSpawn(m_tilemap, m_tilemap.columns(), m_tilemap.rows(), 32,
-                               i * 31 + g_difficulty * 5000);
+                               i * 311 + g_difficulty * 5000 + 731);
 
         auto enemy = std::make_unique<Enemy>(pos, hpBonus, etex);
 
@@ -308,7 +309,8 @@ void GameScene::handleTileCollisions()
 
         auto* tf  = e->getComponent<TransformComponent>();
         auto* col = e->getComponent<ColliderComponent>();
-        if (!tf || !col || col->isTrigger) continue;
+        if (!tf || !col) continue;
+        if (col->isTrigger && e->tag() != "projectile") continue;
 
         FloatRect eBounds = col->worldBounds(tf->position);
 

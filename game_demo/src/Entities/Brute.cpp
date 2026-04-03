@@ -104,11 +104,16 @@ void Brute::updateVisuals()
     float ratio = hp ? hp->ratio() : 0.f;
     m_hpBarFill.setSize({44.f * ratio, 6.f});
 
+    auto* ai = getComponent<AIComponent>();
+    bool justAttacked = (ai && ai->state == AIState::Attack && ai->attackTimer > ai->attackCooldown - 0.2f);
+
     if (isDead()) {
         m_body.setFillColor(sf::Color(30, 10, 40));
         m_body.setOutlineColor(sf::Color(50, 20, 60));
     } else if (m_hurtFlash > 0.f) {
         m_body.setFillColor(sf::Color(255, 180, 255));
+    } else if (justAttacked) {
+        m_body.setFillColor(sf::Color(255, 255, 100)); // flash yellow
     } else {
         auto r = static_cast<uint8_t>(80 * ratio);
         m_body.setFillColor(sf::Color(r, 20, 120));
@@ -129,7 +134,14 @@ void Brute::render(sf::RenderWindow& window)
 
     if (m_sprite) {
         m_sprite->setPosition(pos);
-        m_sprite->setColor(m_hurtFlash > 0.f ? sf::Color(255, 150, 255) : sf::Color::White);
+        
+        auto* ai = getComponent<AIComponent>();
+        bool justAttacked = (ai && ai->state == AIState::Attack && ai->attackTimer > ai->attackCooldown - 0.3f);
+        
+        if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 150, 255));
+        else if (justAttacked) m_sprite->setColor(sf::Color(255, 255, 100));
+        else m_sprite->setColor(sf::Color::White);
+        
         window.draw(*m_sprite);
     } else {
         m_body.setPosition(pos);

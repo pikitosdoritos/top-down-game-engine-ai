@@ -1,0 +1,64 @@
+[1/2] Building CXX object game_demo/CMakeFiles/game_demo.dir/src/Entities/Projectile.cpp.obj
+FAILED: [code=1] game_demo/CMakeFiles/game_demo.dir/src/Entities/Projectile.cpp.obj 
+C:\msys64\mingw64\bin\g++.exe  -IE:/projects/top-down-game-engine-ai/game_demo/src -IE:/projects/top-down-game-engine-ai/engine/include -IE:/projects/top-down-game-engine-ai/third_party -g -std=c++17 -Wall -Wextra -Wpedantic -MD -MT game_demo/CMakeFiles/game_demo.dir/src/Entities/Projectile.cpp.obj -MF game_demo\CMakeFiles\game_demo.dir\src\Entities\Projectile.cpp.obj.d -o game_demo/CMakeFiles/game_demo.dir/src/Entities/Projectile.cpp.obj -c E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Entity.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:1:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::onAttach(engine::Entity&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:13:35: warning: unused parameter 'owner' [-Wunused-parameter]
+   13 |     virtual void onAttach(Entity& owner) {}
+      |                           ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::update(engine::Entity&, engine::GameEngine&, float)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:33: warning: unused parameter 'owner' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                         ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:52: warning: unused parameter 'engine' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                        ~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:66: warning: unused parameter 'dt' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                                            ~~~~~~^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.hpp: At global scope:
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.hpp:24:23: error: 'Sprite' is not a member of 'sf'
+   24 |     std::optional<sf::Sprite> m_sprite;
+      |                       ^~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.hpp:24:29: error: template argument 1 is invalid
+   24 |     std::optional<sf::Sprite> m_sprite;
+      |                             ^
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/SceneManager.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/engine/include/engine/Core/GameEngine.hpp:4,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:2:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp: In member function 'virtual void engine::IScene::handleEvent(engine::GameEngine&, const sf::Event&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:50: warning: unused parameter 'engine' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                              ~~~~~~~~~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:75: warning: unused parameter 'event' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                                                          ~~~~~~~~~~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp: In constructor 'Projectile::Projectile(engine::Vec2f, engine::Vec2f, float, float, float, const sf::Texture*)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:15:18: error: request for member 'emplace' in '((Projectile*)this)->Projectile::m_sprite', which is of non-class type 'int'
+   15 |         m_sprite.emplace(*tex);
+      |                  ^~~~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:16:17: error: base operand of '->' is not a pointer
+   16 |         m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:17:28: error: 'atan2' is not a member of 'std'
+   17 |         float angle = std::atan2(direction.y, direction.x) * (180.f / 3.14159265f);
+      |                            ^~~~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:18:17: error: base operand of '->' is not a pointer
+   18 |         m_sprite->setRotation(sf::degrees(angle));
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp: In member function 'virtual void Projectile::render(sf::RenderWindow&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:78:17: error: base operand of '->' is not a pointer
+   78 |         m_sprite->setPosition(tf->position);
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:79:28: error: base operand of '->' is not a pointer
+   79 |         auto col = m_sprite->getColor();
+      |                            ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:81:17: error: base operand of '->' is not a pointer
+   81 |         m_sprite->setColor(col);
+      |                 ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Entities/Projectile.cpp:82:21: error: invalid type argument of unary '*' (have 'int')
+   82 |         window.draw(*m_sprite);
+      |                     ^~~~~~~~~
+ninja: build stopped: subcommand failed.

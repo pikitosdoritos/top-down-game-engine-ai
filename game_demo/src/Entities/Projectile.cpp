@@ -4,13 +4,20 @@
 #include "engine/Components/VelocityComponent.hpp"
 #include "engine/Components/ColliderComponent.hpp"
 #include "engine/Components/HealthComponent.hpp"
+#include <cmath>
 
 using namespace engine;
 
 Projectile::Projectile(Vec2f origin, Vec2f direction,
-                        float speed, float dmg, float lifetime)
+                        float speed, float dmg, float lifetime, const sf::Texture* tex)
     : Entity("projectile"), damage(dmg), m_lifetime(lifetime)
 {
+    if (tex) {
+        m_sprite.emplace(*tex);
+        m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+        float angle = std::atan2(direction.y, direction.x) * (180.f / 3.14159265f);
+        m_sprite->setRotation(sf::degrees(angle));
+    }
     addComponent<TransformComponent>(origin);
 
     auto& vel = addComponent<VelocityComponent>();
@@ -67,9 +74,18 @@ void Projectile::render(sf::RenderWindow& window)
         : 255;
 
     auto fill    = sf::Color(255, 160, 30, alpha);
-    auto outline = sf::Color(255, 230, 120, alpha);
-    m_shape.setFillColor(fill);
-    m_shape.setOutlineColor(outline);
-    m_shape.setPosition(tf->position);
-    window.draw(m_shape);
+    
+    if (m_sprite) {
+        m_sprite->setPosition(tf->position);
+        auto col = m_sprite->getColor();
+        col.a = alpha;
+        m_sprite->setColor(col);
+        window.draw(*m_sprite);
+    } else {
+        auto outline = sf::Color(255, 230, 120, alpha);
+        m_shape.setFillColor(fill);
+        m_shape.setOutlineColor(outline);
+        m_shape.setPosition(tf->position);
+        window.draw(m_shape);
+    }
 }

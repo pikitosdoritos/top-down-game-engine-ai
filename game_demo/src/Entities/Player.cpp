@@ -17,11 +17,15 @@ static Vec2f vecNorm(Vec2f v) {
     return l > 0.f ? Vec2f{v.x / l, v.y / l} : Vec2f{1.f, 0.f};
 }
 
-Player::Player(const sf::Texture* tex) : Entity("player")
+Player::Player(const sf::Texture* tex, const sf::Texture* swordTex) : Entity("player")
 {
     if (tex) {
         m_sprite.emplace(*tex);
         m_sprite->setOrigin({tex->getSize().x / 2.f, tex->getSize().y / 2.f});
+    }
+    if (swordTex) {
+        m_swordSprite.emplace(*swordTex);
+        m_swordSprite->setOrigin({0.f, swordTex->getSize().y / 2.f});
     }
 
     addComponent<TransformComponent>(Vec2f{0.f, 0.f});
@@ -123,8 +127,9 @@ void Player::handleAttack(GameEngine& engine, float dt, const sf::View& cameraVi
             Vec2f mouse = engine.input().mouseWorldPosition(engine.window().sfWindow(), cameraView);
             Vec2f dir   = vecNorm(mouse - tf->position);
             m_facing = dir;
+            const sf::Texture* btex = engine.resources().getTexture("bullet");
             pendingSpawns.push_back(
-                std::make_unique<Projectile>(tf->position, dir, 420.f, attackDamage, 1.8f));
+                std::make_unique<Projectile>(tf->position, dir, 420.f, attackDamage, 1.8f, btex));
         }
         m_attackCooldown = 0.22f;
         m_attackTimer    = 0.12f;
@@ -186,10 +191,17 @@ void Player::render(sf::RenderWindow& window)
 
     if (m_state != State::Dead) {
         float angle = std::atan2(m_facing.y, m_facing.x) * (180.f / 3.14159265f);
-        m_sword.setPosition({pos.x + m_facing.x * 14.f,
-                              pos.y + m_facing.y * 14.f});
-        m_sword.setRotation(sf::degrees(angle));
-        window.draw(m_sword);
+        Vec2f swordPos = {pos.x + m_facing.x * 14.f, pos.y + m_facing.y * 14.f};
+        
+        if (m_swordSprite) {
+            m_swordSprite->setPosition(swordPos);
+            m_swordSprite->setRotation(sf::degrees(angle));
+            window.draw(*m_swordSprite);
+        } else {
+            m_sword.setPosition(swordPos);
+            m_sword.setRotation(sf::degrees(angle));
+            window.draw(m_sword);
+        }
     }
 }
 

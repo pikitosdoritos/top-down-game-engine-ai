@@ -101,19 +101,22 @@ void Enemy::updateVisuals()
 {
     auto* hp = getComponent<HealthComponent>();
     float ratio = hp ? hp->ratio() : 0.f;
+    m_hpBarFill.setSize({32.f * ratio, 5.f});
+
+    auto* ai = getComponent<AIComponent>();
+    bool justAttacked = (ai && ai->state == AIState::Attack && ai->attackTimer > ai->attackCooldown - 0.2f);
 
     if (isDead()) {
-        m_body.setFillColor(sf::Color(40, 20, 20));
-        m_body.setOutlineColor(sf::Color(60, 30, 30));
+        m_body.setFillColor(sf::Color(80, 20, 20));
+        m_body.setOutlineColor(sf::Color(100, 30, 30));
     } else if (m_hurtFlash > 0.f) {
-        m_body.setFillColor(sf::Color(255, 220, 220));
+        m_body.setFillColor(sf::Color(255, 150, 150));
+    } else if (justAttacked) {
+        m_body.setFillColor(sf::Color(255, 255, 100)); // Flash yellow when attacking!
     } else {
-        // Darken toward black as HP falls
-        auto r = static_cast<uint8_t>(80 + static_cast<uint8_t>(ratio * 80));
+        auto r = static_cast<uint8_t>(160 * ratio);
         m_body.setFillColor(sf::Color(r, 30, 30));
     }
-
-    m_hpBarFill.setSize({32.f * ratio, 5.f});
 }
 
 void Enemy::render(sf::RenderWindow& window)
@@ -130,9 +133,15 @@ void Enemy::render(sf::RenderWindow& window)
 
     if (m_sprite) {
         m_sprite->setPosition(pos);
+        
+        auto* ai = getComponent<AIComponent>();
+        bool justAttacked = (ai && ai->state == AIState::Attack && ai->attackTimer > ai->attackCooldown - 0.2f);
+        
         if (isDead()) m_sprite->setColor(sf::Color(80, 80, 80));
-        else if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 120, 120));
+        else if (m_hurtFlash > 0.f) m_sprite->setColor(sf::Color(255, 150, 150));
+        else if (justAttacked) m_sprite->setColor(sf::Color(255, 255, 100));
         else m_sprite->setColor(sf::Color::White);
+        
         window.draw(*m_sprite);
     } else {
         m_body.setPosition(pos);
