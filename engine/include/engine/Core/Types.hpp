@@ -16,8 +16,12 @@ using FloatRect = sf::FloatRect;
 enum class SceneID : uint8_t {
     None = 0,
     Menu,
-    Game,
+    Game,         // legacy single-level mode (difficulty selector)
     GameOver,
+    Level1,       // campaign level 1 — Cursed Village
+    Level2,       // campaign level 2 — Bone Crypts
+    Level3,       // campaign level 3 — The Abyss
+    CampaignVictory,
 };
 
 // Collision layers (bitmask)
