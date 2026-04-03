@@ -17,7 +17,8 @@ static Vec2f vecNorm(Vec2f v) {
     return l > 0.f ? Vec2f{v.x / l, v.y / l} : Vec2f{1.f, 0.f};
 }
 
-Player::Player(const sf::Texture* tex, const sf::Texture* swordTex) : Entity("player")
+Player::Player(const sf::Texture* tex, const sf::Texture* swordTex, const sf::Texture* swingTex)
+    : Entity("player"), m_swingTex(swingTex)
 {
     if (tex) {
         m_sprite.emplace(*tex);
@@ -26,6 +27,11 @@ Player::Player(const sf::Texture* tex, const sf::Texture* swordTex) : Entity("pl
     if (swordTex) {
         m_swordSprite.emplace(*swordTex);
         m_swordSprite->setOrigin({0.f, swordTex->getSize().y / 2.f});
+    }
+    if (swingTex) {
+        m_swingSprite.emplace(*swingTex);
+        m_swingSprite->setTextureRect(sf::IntRect({0, 0}, {m_swingFrameW, m_swingFrameH}));
+        m_swingSprite->setOrigin({m_swingFrameW / 2.f, m_swingFrameH / 2.f});
     }
 
     addComponent<TransformComponent>(Vec2f{0.f, 0.f});
@@ -80,6 +86,21 @@ void Player::update(GameEngine& engine, float dt)
 
     updateVisuals();
     Entity::update(engine, dt);
+
+    // Advance sword swing animation when attacking
+    if (m_attacking && m_swingSprite && m_swingTex) {
+        float frameDur = m_attackDuration / m_swingFrames;
+        m_swingFrameTime += dt;
+        if (m_swingFrameTime >= frameDur) {
+            m_swingFrameTime -= frameDur;
+            m_swingFrame = (m_swingFrame + 1) % m_swingFrames;
+        }
+        m_swingSprite->setTextureRect(
+            sf::IntRect({m_swingFrame * m_swingFrameW, 0}, {m_swingFrameW, m_swingFrameH}));
+    } else {
+        m_swingFrame     = 0;
+        m_swingFrameTime = 0.f;
+    }
 }
 
 void Player::handleMovement(GameEngine& engine)
@@ -127,9 +148,10 @@ void Player::handleAttack(GameEngine& engine, float dt, const sf::View& cameraVi
             Vec2f mouse = engine.input().mouseWorldPosition(engine.window().sfWindow(), cameraView);
             Vec2f dir   = vecNorm(mouse - tf->position);
             m_facing = dir;
-            const sf::Texture* btex = engine.resources().getTexture("bullet");
+            const sf::Texture* btex     = engine.resources().getTexture("bullet");
+            const sf::Texture* banimTex = engine.resources().getTexture("bullet_anim");
             pendingSpawns.push_back(
-                std::make_unique<Projectile>(tf->position, dir, 420.f, attackDamage, 1.8f, btex));
+                std::make_unique<Projectile>(tf->position, dir, 420.f, attackDamage, 1.8f, btex, banimTex));
         }
         m_attackCooldown = 0.22f;
         m_attackTimer    = 0.12f;
@@ -192,10 +214,18 @@ void Player::render(sf::RenderWindow& window)
     if (m_state != State::Dead) {
         float angle = std::atan2(m_facing.y, m_facing.x) * (180.f / 3.14159265f);
         Vec2f swordPos = {pos.x + m_facing.x * 14.f, pos.y + m_facing.y * 14.f};
-        
+
+        // Swing arc animation — drawn behind the sword sprite during attack
+        if (m_attacking && m_swingSprite) {
+            Vec2f arcPos = {pos.x + m_facing.x * 20.f, pos.y + m_facing.y * 20.f};
+            m_swingSprite->setPosition(arcPos);
+            m_swingSprite->setRotation(sf::degrees(angle + 90.f));
+            window.draw(*m_swingSprite);
+        }
+
         if (m_swordSprite) {
             m_swordSprite->setPosition(swordPos);
-            m_swordSprite->setRotation(sf::degrees(angle));
+            m_swordSprite->setRotation(sf::degrees(angle + 90.f));
             window.draw(*m_swordSprite);
         } else {
             m_sword.setPosition(swordPos);

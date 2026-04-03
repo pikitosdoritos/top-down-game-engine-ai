@@ -70,8 +70,10 @@ void GameScene::onEnter(engine::GameEngine& engine)
     try { res.loadTexture("player",  "assets/textures/player.png");  } catch(...) {}
     try { res.loadTexture("enemy",   "assets/textures/enemy.png");   } catch(...) {}
     try { res.loadTexture("tileset", "assets/textures/tileset.png"); } catch(...) {}
-    try { res.loadTexture("sword",   "assets/textures/sword.png");   } catch(...) {}
-    try { res.loadTexture("bullet",  "assets/textures/bullet.png");  } catch(...) {}
+    try { res.loadTexture("sword",        "assets/textures/sword.png");        } catch(...) {}
+    try { res.loadTexture("bullet",       "assets/textures/bullet.png");       } catch(...) {}
+    try { res.loadTexture("sword_swing",  "assets/textures/sword_swing.png");  } catch(...) {}
+    try { res.loadTexture("bullet_anim",  "assets/textures/bullet_anim.png");  } catch(...) {}
 
     // Build tilemap — procedural room, no texture required
     engine::TilesetInfo ts;
@@ -145,10 +147,11 @@ void GameScene::handleEvent(engine::GameEngine& engine, const sf::Event& event)
 
 void GameScene::spawnPlayer(engine::GameEngine& engine)
 {
-    const sf::Texture* ptex = engine.resources().getTexture("player");
+    const sf::Texture* ptex     = engine.resources().getTexture("player");
     const sf::Texture* swordTex = engine.resources().getTexture("sword");
+    const sf::Texture* swingTex = engine.resources().getTexture("sword_swing");
 
-    auto p = std::make_unique<Player>(ptex, swordTex);
+    auto p = std::make_unique<Player>(ptex, swordTex, swingTex);
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
@@ -379,20 +382,6 @@ void GameScene::render(engine::GameEngine& engine)
     });
 
     for (auto* e : drawList) e->render(*win);
-
-    // Melee swing arc (visual feedback)
-    if (m_player && m_player->isAttacking()) {
-        FloatRect hb = m_player->attackHitbox();
-        sf::RectangleShape arc;
-        arc.setSize({hb.size.x, hb.size.y});
-        arc.setOrigin({hb.size.x * 0.5f, hb.size.y * 0.5f});
-        arc.setPosition({hb.position.x + hb.size.x * 0.5f,
-                          hb.position.y + hb.size.y * 0.5f});
-        arc.setFillColor(sf::Color(255, 220, 80, 60));
-        arc.setOutlineColor(sf::Color(255, 240, 120, 120));
-        arc.setOutlineThickness(1.5f);
-        win->draw(arc);
-    }
 
     // UI view — switch to screen-space
     engine.renderer().setUIView();

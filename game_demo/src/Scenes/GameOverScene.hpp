@@ -22,10 +22,14 @@ public:
     void render(engine::GameEngine& engine) override;
 
 private:
+    sf::RectangleShape           m_bg;
+    sf::RectangleShape           m_ruleTop;
+    sf::RectangleShape           m_ruleBot;
     std::optional<engine::Label> m_title;
+    std::optional<engine::Label> m_subtitle;
     std::optional<engine::Label> m_stats;
     std::optional<engine::Label> m_prompt;
-    sf::RectangleShape           m_panel;
+    std::optional<engine::Label> m_hint;
     float m_blinkTimer    = 0.f;
     bool  m_promptVisible = true;
 };

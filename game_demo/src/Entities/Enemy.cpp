@@ -33,7 +33,7 @@ Enemy::Enemy(Vec2f spawnPos, float hp, const sf::Texture* tex) : Entity("enemy")
 
     auto& col = addComponent<ColliderComponent>(Vec2f{28.f, 28.f});
     col.layer = CollisionLayer::Enemy;
-    col.mask  = CollisionLayer::Player | CollisionLayer::Projectile | CollisionLayer::Wall;
+    col.mask  = CollisionLayer::Player | CollisionLayer::Projectile | CollisionLayer::Wall | CollisionLayer::Enemy;
 
     auto& ai = addComponent<AIComponent>();
     ai.detectionRange = 380.f;

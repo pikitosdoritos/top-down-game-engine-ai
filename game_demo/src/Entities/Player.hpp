@@ -5,15 +5,19 @@
 #include <SFML/Graphics/CircleShape.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Sprite.hpp>
+#include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/View.hpp>
 #include <memory>
 #include <vector>
+#include <optional>
 
 namespace engine { class GameEngine; }
 
 class Player : public engine::Entity {
 public:
-    Player(const sf::Texture* tex = nullptr, const sf::Texture* swordTex = nullptr);
+    Player(const sf::Texture* tex = nullptr,
+           const sf::Texture* swordTex = nullptr,
+           const sf::Texture* swingTex = nullptr);
 
     void update(engine::GameEngine& engine, float dt) override;
     void render(sf::RenderWindow& window) override;
@@ -21,10 +25,8 @@ public:
     bool isAttacking() const { return m_attacking; }
     engine::FloatRect attackHitbox() const;
 
-    // Called by GameScene each frame so handleAttack can use correct world coords
     void setCameraView(const sf::View& v) { m_cameraView = v; }
 
-    // Entities queued for spawn (drained by GameScene each frame)
     std::vector<std::unique_ptr<engine::Entity>> pendingSpawns;
 
     float moveSpeed    = 180.f;
@@ -37,8 +39,8 @@ private:
 
     sf::RectangleShape m_body;
     sf::RectangleShape m_sword;
-    sf::CircleShape m_shadow;
-    sf::CircleShape m_glow;
+    sf::CircleShape    m_shadow;
+    sf::CircleShape    m_glow;
 
     enum class State { Idle, Walk, Attack, Dead };
     State m_state          = State::Idle;
@@ -47,7 +49,17 @@ private:
     float m_attackCooldown = 0.f;
     bool  m_attacking      = false;
     engine::Vec2f m_facing {1.f, 0.f};
-    sf::View  m_cameraView;
+    sf::View      m_cameraView;
+
     std::optional<sf::Sprite> m_sprite;
     std::optional<sf::Sprite> m_swordSprite;
+
+    // Sword swing animation
+    const sf::Texture*        m_swingTex      = nullptr;
+    std::optional<sf::Sprite> m_swingSprite;
+    int   m_swingFrames     = 8;
+    int   m_swingFrameW     = 64;
+    int   m_swingFrameH     = 64;
+    float m_swingFrameTime  = 0.f;   // time accumulator
+    int   m_swingFrame      = 0;
 };

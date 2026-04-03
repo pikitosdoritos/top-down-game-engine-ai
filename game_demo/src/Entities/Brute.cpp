@@ -28,7 +28,7 @@ Brute::Brute(Vec2f spawnPos, float hp, float speed, float damage,
 
     auto& col = addComponent<ColliderComponent>(Vec2f{38.f, 38.f});
     col.layer = CollisionLayer::Enemy;
-    col.mask  = CollisionLayer::Player | CollisionLayer::Projectile | CollisionLayer::Wall;
+    col.mask  = CollisionLayer::Player | CollisionLayer::Projectile | CollisionLayer::Wall | CollisionLayer::Enemy;
 
     auto& ai = addComponent<AIComponent>();
     ai.detectionRange = 460.f;

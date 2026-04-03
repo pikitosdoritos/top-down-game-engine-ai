@@ -70,8 +70,10 @@ void CampaignLevelScene::onEnter(engine::GameEngine& engine)
     try { res.loadTexture("player",    "assets/textures/player.png"); }  catch(...) {}
     try { res.loadTexture("enemy",     "assets/textures/enemy.png");  }  catch(...) {}
     try { res.loadTexture("brute",     "assets/textures/brute.png");  }  catch(...) {}
-    try { res.loadTexture("sword",     "assets/textures/sword.png");  }  catch(...) {}
-    try { res.loadTexture("bullet",    "assets/textures/bullet.png"); }  catch(...) {}
+    try { res.loadTexture("sword",        "assets/textures/sword.png");        }  catch(...) {}
+    try { res.loadTexture("bullet",       "assets/textures/bullet.png");       }  catch(...) {}
+    try { res.loadTexture("sword_swing",  "assets/textures/sword_swing.png");  }  catch(...) {}
+    try { res.loadTexture("bullet_anim",  "assets/textures/bullet_anim.png");  }  catch(...) {}
     try { res.loadTexture("current_tileset", "assets/textures/" + cfg.tilesetAsset + ".png"); } catch(...) {}
 
     buildMap(engine);
@@ -389,10 +391,11 @@ void CampaignLevelScene::buildMap(engine::GameEngine& engine)
 void CampaignLevelScene::spawnPlayer(engine::GameEngine& engine)
 {
     const LevelConfig& cfg = CampaignState::current();
-    const sf::Texture* ptex = engine.resources().getTexture("player");
+    const sf::Texture* ptex     = engine.resources().getTexture("player");
     const sf::Texture* swordTex = engine.resources().getTexture("sword");
+    const sf::Texture* swingTex = engine.resources().getTexture("sword_swing");
 
-    auto p = std::make_unique<Player>(ptex, swordTex);
+    auto p = std::make_unique<Player>(ptex, swordTex, swingTex);
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
