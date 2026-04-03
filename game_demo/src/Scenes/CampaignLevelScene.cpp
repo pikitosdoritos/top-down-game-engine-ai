@@ -32,14 +32,18 @@ static Vec2f aabbOverlap(const FloatRect& a, const FloatRect& b)
     return {ox, oy};
 }
 
-// Generates a pseudorandom spawn point safely inside the map bounds.
-static Vec2f safeSpawn(int cols, int rows, int tileSize, int seed)
+// Generates a pseudorandom spawn point safely inside the map bounds on a floor tile.
+static Vec2f safeSpawn(const Tilemap& tm, int cols, int rows, int tileSize, int seed)
 {
-    // Keep at least 4 tiles from the walls, never in the exact same spot
     srand(static_cast<unsigned>(seed * 7919 + 1337));
-    int margin = 4;
-    int x = margin + rand() % std::max(1, cols - margin * 2);
-    int y = margin + rand() % std::max(1, rows - margin * 2);
+    int x = 0, y = 0;
+    int tries = 0;
+    while (tries < 100) {
+        x = rand() % cols;
+        y = rand() % rows;
+        if (!tm.isSolid(x, y)) break;
+        tries++;
+    }
     return {(x + 0.5f) * tileSize, (y + 0.5f) * tileSize};
 }
 
@@ -413,7 +417,7 @@ void CampaignLevelScene::spawnPlayer(engine::GameEngine& engine)
                 // Tilemap doesn't expose collision grid directly but we can assume buildDungeon works
                 // Just use first room from buildDungeon logic or simple check:
                 // Actually let's just use the safeSpawn logic with a seed
-                tf->position = safeSpawn(cfg.mapCols, cfg.mapRows, cfg.tileSize, 12345);
+                tf->position = safeSpawn(m_tilemap, cfg.mapCols, cfg.mapRows, cfg.tileSize, 12345);
                 found = true;
             }
         }
@@ -448,7 +452,7 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
 
     // Grunts
     for (int i = 0; i < cfg.gruntCount; ++i) {
-        Vec2f pos = safeSpawn(cfg.mapCols, cfg.mapRows, cfg.tileSize,
+        Vec2f pos = safeSpawn(m_tilemap, cfg.mapCols, cfg.mapRows, cfg.tileSize,
                                i * 31 + 5000 + CampaignState::get().currentLevel * 100);
 
         auto enemy = std::make_unique<Enemy>(pos, cfg.gruntHP, etex);
@@ -462,7 +466,7 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
     // Brutes (level 2+)
     const sf::Texture* btex = engine.resources().getTexture("brute");
     for (int i = 0; i < cfg.bruteCount; ++i) {
-        Vec2f pos = safeSpawn(cfg.mapCols, cfg.mapRows, cfg.tileSize,
+        Vec2f pos = safeSpawn(m_tilemap, cfg.mapCols, cfg.mapRows, cfg.tileSize,
                                i * 53 + 9000 + CampaignState::get().currentLevel * 200);
 
         auto brute = std::make_unique<Brute>(pos,

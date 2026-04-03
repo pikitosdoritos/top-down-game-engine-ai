@@ -70,9 +70,10 @@ void FogOfWar::rebuildVertices() const
     for (int y = 0; y < m_rows; ++y) {
         for (int x = 0; x < m_cols; ++x) {
             TileVis v = m_grid[y * m_cols + x];
-            if (v == TileVis::Visible) continue; // fully transparent — skip alpha
-
-            sf::Color col = (v == TileVis::Hidden) ? colHidden : colExplored;
+            
+            sf::Color col = sf::Color::Transparent;
+            if (v == TileVis::Hidden) col = colHidden;
+            else if (v == TileVis::Explored) col = colExplored;
 
             float wx = static_cast<float>(x * m_tileW);
             float wy = static_cast<float>(y * m_tileH);

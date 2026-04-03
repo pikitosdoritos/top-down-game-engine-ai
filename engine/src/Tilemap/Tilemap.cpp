@@ -149,10 +149,14 @@ void Tilemap::buildVertices(const TilesetInfo& tileset)
 
             int tileCol = tile % sheetCols;
             int tileRow = tile / sheetCols;
-            float u  = static_cast<float>(tileCol * tileset.tileWidth);
-            float v  = static_cast<float>(tileRow * tileset.tileHeight);
             float tw = static_cast<float>(tileset.tileWidth);
             float th = static_cast<float>(tileset.tileHeight);
+            
+            // Add slight UV padding to avoid bleeding/seams
+            float u  = static_cast<float>(tileCol * tileset.tileWidth) + 0.1f;
+            float v  = static_cast<float>(tileRow * tileset.tileHeight) + 0.1f;
+            tw -= 0.2f;
+            th -= 0.2f;
 
             // Default fallback colors
             sf::Color tileColor = sf::Color::White;

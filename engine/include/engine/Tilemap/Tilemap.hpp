@@ -45,6 +45,7 @@ public:
 
     FloatRect worldBounds() const;
 
+    int columns()    const { return m_cols; }
     int rows()       const { return m_rows; }
     int tileWidth()  const { return m_tileW; }
     int tileHeight() const { return m_tileH; }
