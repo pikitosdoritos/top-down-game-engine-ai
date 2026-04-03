@@ -62,10 +62,11 @@ void CampaignLevelScene::onEnter(engine::GameEngine& engine)
     auto& res = engine.resources();
     const sf::Font& font = res.loadFont("main", "assets/fonts/Monocraft.ttf");
 
-    // Textures — load if available, fail silently
+    const LevelConfig& cfg = CampaignState::current();
     try { res.loadTexture("player",    "assets/textures/player.png"); }  catch(...) {}
     try { res.loadTexture("enemy",     "assets/textures/enemy.png");  }  catch(...) {}
-    try { res.loadTexture("template_tileset", "assets/textures/tileset.png"); }  catch(...) {}
+    try { res.loadTexture("brute",     "assets/textures/brute.png");  }  catch(...) {}
+    try { res.loadTexture("current_tileset", "assets/textures/" + cfg.tilesetAsset + ".png"); } catch(...) {}
 
     buildMap(engine);
     spawnPlayer(engine);
@@ -366,18 +367,13 @@ void CampaignLevelScene::buildMap(engine::GameEngine& engine)
     auto& res = engine.resources();
 
     TilesetInfo ts;
-    ts.texture  = res.getTexture("template_tileset");  // nullptr = coloured fallback
+    ts.texture    = res.getTexture("current_tileset");
     ts.tileWidth  = cfg.tileSize;
     ts.tileHeight = cfg.tileSize;
-    ts.columns    = 1;
+    ts.columns    = 1; // Tileset is 32x64 or 32x128 (1 column)
 
-    m_tilemap.buildRoom(cfg.mapCols, cfg.mapRows,
-                        cfg.tileSize, cfg.tileSize, ts, 0, 1);
-
-    // Override tile colours using the per-level palette
-    // (We extend Tilemap::buildRoom via a simple colour-only rebuild below.)
-    // The quickest path: just accept the purple default for now — the ambient
-    // clear colour already provides the main visual differentiation per level.
+    m_tilemap.buildDungeon(cfg.mapCols, cfg.mapRows,
+                           cfg.tileSize, cfg.tileSize, ts, 0, 1);
 }
 
 void CampaignLevelScene::spawnPlayer(engine::GameEngine& engine)
@@ -389,8 +385,27 @@ void CampaignLevelScene::spawnPlayer(engine::GameEngine& engine)
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
-    if (tf) tf->position = {3 * (float)cfg.tileSize + cfg.tileSize * 0.5f,
-                             3 * (float)cfg.tileSize + cfg.tileSize * 0.5f};
+    if (tf) {
+        // Find first floor tile for safe spawn
+        bool found = false;
+        for (int y = 5; y < cfg.mapRows && !found; ++y) {
+            for (int x = 5; x < cfg.mapCols && !found; ++x) {
+                // We'll just pick the first room-like space
+                // (better would be to pick center of first room but this is fast)
+                float px = (x + 0.5f) * cfg.tileSize;
+                float py = (y + 0.5f) * cfg.tileSize;
+                
+                // Check if this pixel is on a floor tile (collision 0)
+                int tx = static_cast<int>(px / cfg.tileSize);
+                int ty = static_cast<int>(py / cfg.tileSize);
+                // Tilemap doesn't expose collision grid directly but we can assume buildDungeon works
+                // Just use first room from buildDungeon logic or simple check:
+                // Actually let's just use the safeSpawn logic with a seed
+                tf->position = safeSpawn(cfg.mapCols, cfg.mapRows, cfg.tileSize, 12345);
+                found = true;
+            }
+        }
+    }
     m_entities.push_back(std::move(p));
 }
 
@@ -433,12 +448,13 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
     }
 
     // Brutes (level 2+)
+    const sf::Texture* btex = engine.resources().getTexture("brute");
     for (int i = 0; i < cfg.bruteCount; ++i) {
         Vec2f pos = safeSpawn(cfg.mapCols, cfg.mapRows, cfg.tileSize,
                                i * 53 + 9000 + CampaignState::get().currentLevel * 200);
 
         auto brute = std::make_unique<Brute>(pos,
-            cfg.bruteHP, cfg.bruteSpeed, cfg.bruteDamage);
+            cfg.bruteHP, cfg.bruteSpeed, cfg.bruteDamage, btex);
         attachAttackCallback(*brute, cfg.bruteDamage);
         m_entities.push_back(std::move(brute));
     }

@@ -50,6 +50,85 @@ void Tilemap::buildRoom(int cols, int rows, int tileW, int tileH,
     buildVertices(tileset);
 }
 
+void Tilemap::buildDungeon(int cols, int rows, int tileW, int tileH,
+                           const TilesetInfo& tileset,
+                           int floorTile, int wallTile)
+{
+    m_cols  = cols;
+    m_rows  = rows;
+    m_tileW = tileW;
+    m_tileH = tileH;
+    m_texture = tileset.texture;
+
+    m_tiles.assign(cols * rows, wallTile);
+    m_collision.assign(cols * rows, 1);
+
+    struct Room { int x, y, w, h; };
+    std::vector<Room> rooms;
+
+    int numRooms = 5 + (cols * rows) / 400; // room density
+    for (int i = 0; i < numRooms; ++i) {
+        int rw = 4 + rand() % 6;
+        int rh = 4 + rand() % 6;
+        int rx = 1 + rand() % (cols - rw - 1);
+        int ry = 1 + rand() % (rows - rh - 1);
+
+        // Simple overlap check
+        bool overlap = false;
+        for (const auto& r : rooms) {
+            if (rx < r.x + r.w + 1 && rx + rw + 1 > r.x &&
+                ry < r.y + r.h + 1 && ry + rh + 1 > r.y) {
+                overlap = true;
+                break;
+            }
+        }
+        if (overlap) continue;
+
+        // Carve room
+        for (int y = ry; y < ry + rh; ++y) {
+            for (int x = rx; x < rx + rw; ++x) {
+                int idx = y * cols + x;
+                m_tiles[idx]     = floorTile;
+                m_collision[idx] = 0;
+            }
+        }
+
+        // Corridor to previous room
+        if (!rooms.empty()) {
+            Room& prev = rooms.back();
+            int cx1 = rx + rw / 2;
+            int cy1 = ry + rh / 2;
+            int cx2 = prev.x + prev.w / 2;
+            int cy2 = prev.y + prev.h / 2;
+
+            // L-shape corridor
+            auto carveH = [&](int x1, int x2, int y) {
+                for (int x = std::min(x1, x2); x <= std::max(x1, x2); ++x) {
+                    m_tiles[y * cols + x]     = floorTile;
+                    m_collision[y * cols + x] = 0;
+                }
+            };
+            auto carveV = [&](int y1, int y2, int x) {
+                for (int y = std::min(y1, y2); y <= std::max(y1, y2); ++y) {
+                    m_tiles[y * m_cols + x]     = floorTile;
+                    m_collision[y * m_cols + x] = 0;
+                }
+            };
+
+            if (rand() % 2 == 0) {
+                carveH(cx1, cx2, cy1);
+                carveV(cy1, cy2, cx2);
+            } else {
+                carveV(cy1, cy2, cx1);
+                carveH(cx1, cx2, cy2);
+            }
+        }
+        rooms.push_back({rx, ry, rw, rh});
+    }
+
+    buildVertices(tileset);
+}
+
 void Tilemap::buildVertices(const TilesetInfo& tileset)
 {
     m_solidRects.clear();
@@ -75,10 +154,13 @@ void Tilemap::buildVertices(const TilesetInfo& tileset)
             float tw = static_cast<float>(tileset.tileWidth);
             float th = static_cast<float>(tileset.tileHeight);
 
-            // Colour tiles by type when no texture is provided
-            sf::Color tileColor = (m_collision[idx])
-                ? sf::Color(60, 40, 80)   // wall: dark purple
-                : sf::Color(35, 25, 50);  // floor: very dark purple
+            // Default fallback colors
+            sf::Color tileColor = sf::Color::White;
+            if (!m_texture) {
+                tileColor = (m_collision[idx])
+                    ? sf::Color(60, 40, 80)   // wall
+                    : sf::Color(35, 25, 50);  // floor
+            }
 
             // 6 vertices (2 triangles)
             sf::Vertex* tri = &m_vertices[idx * 6];
@@ -93,7 +175,6 @@ void Tilemap::buildVertices(const TilesetInfo& tileset)
             tri[5] = {{wx,      wy + wh}, tileColor, {u,      v + th}};
 
             if (m_collision[idx]) {
-                // SFML 3: FloatRect({position}, {size})
                 m_solidRects.push_back({{wx, wy}, {ww, wh}});
             }
         }

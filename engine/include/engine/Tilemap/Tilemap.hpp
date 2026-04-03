@@ -33,6 +33,11 @@ public:
                    const TilesetInfo& tileset,
                    int floorTile = 0, int wallTile = 1);
 
+    // Build a procedural dungeon with rooms and corridors (ADOM-style)
+    void buildDungeon(int cols, int rows, int tileW, int tileH,
+                      const TilesetInfo& tileset,
+                      int floorTile = 0, int wallTile = 1);
+
     void draw(sf::RenderWindow& window) const;
 
     // Returns all solid AABB rects for collision

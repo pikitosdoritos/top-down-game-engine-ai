@@ -68,7 +68,7 @@ void GameScene::onEnter(engine::GameEngine& engine)
     if (g_difficulty == 0) { w = 20; h = 16; } // Easy
     else if (g_difficulty == 2) { w = 45; h = 35; } // Hard
     
-    m_tilemap.buildRoom(w, h, 32, 32, ts, 0, 1);
+    m_tilemap.buildDungeon(w, h, 32, 32, ts, 0, 1);
 
     // Camera
     float W = static_cast<float>(engine.window().width());
