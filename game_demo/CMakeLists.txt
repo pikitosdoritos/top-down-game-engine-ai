@@ -3,9 +3,13 @@ add_executable(game_demo
     src/Scenes/MenuScene.cpp
     src/Scenes/GameScene.cpp
     src/Scenes/GameOverScene.cpp
+    src/Scenes/CampaignLevelScene.cpp
+    src/Scenes/CampaignVictoryScene.cpp
     src/Entities/Player.cpp
     src/Entities/Enemy.cpp
+    src/Entities/Brute.cpp
     src/Entities/Projectile.cpp
+    src/Campaign/CampaignState.cpp
 )
 
 target_include_directories(game_demo

@@ -13,6 +13,7 @@ add_library(engine STATIC
     src/Collision/CollisionSystem.cpp
     src/Camera/Camera.cpp
     src/Tilemap/Tilemap.cpp
+    src/Tilemap/FogOfWar.cpp
     src/Audio/AudioManager.cpp
     src/Resources/ResourceManager.cpp
     src/UI/HealthBar.cpp

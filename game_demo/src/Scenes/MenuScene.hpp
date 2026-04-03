@@ -15,14 +15,24 @@ public:
     void render(engine::GameEngine& engine) override;
 
 private:
-    int m_selectedDiff = 1; // 0=Easy, 1=Medium, 2=Hard
+    // 0=Campaign, 1=Quick Play
+    int m_selectedMode = 0;
+    // Quick Play difficulty: 0=Easy, 1=Medium, 2=Hard
+    int m_selectedDiff = 1;
+
+    std::optional<engine::Label> m_title;
+    std::optional<engine::Label> m_subtitle;
+
+    std::optional<engine::Label> m_btnCampaign;
+    std::optional<engine::Label> m_btnQuickPlay;
+
+    // Quick-play difficulty sub-buttons
     std::optional<engine::Label> m_btnEasy;
     std::optional<engine::Label> m_btnMedium;
     std::optional<engine::Label> m_btnHard;
 
-    std::optional<engine::Label> m_title;
-    std::optional<engine::Label> m_subtitle;
+    std::optional<engine::Label> m_controls;
     std::optional<engine::Label> m_prompt;
-    float m_blinkTimer = 0.f;
+    float m_blinkTimer    = 0.f;
     bool  m_promptVisible = true;
 };
