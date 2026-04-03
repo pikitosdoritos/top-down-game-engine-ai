@@ -32,9 +32,14 @@ void AIComponent::update(Entity& owner, GameEngine& engine, float dt)
     // State transitions
     if (dist <= attackRange)
         state = AIState::Attack;
-    else if (dist <= detectionRange)
-        state = AIState::Chase;
-    else
+    else if (dist <= detectionRange) {
+        // Only chase if we have line of sight (or no LOS check is set)
+        bool canSee = !hasLineOfSight || hasLineOfSight(tf->position, targetPosition);
+        if (canSee)
+            state = AIState::Chase;
+        else
+            state = AIState::Idle;
+    } else
         state = AIState::Idle;
 
     // Behaviour

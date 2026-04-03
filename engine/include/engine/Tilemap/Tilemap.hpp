@@ -55,6 +55,10 @@ public:
         return m_collision[ty * m_cols + tx] != 0;
     }
 
+    // DDA raycast: returns true if the straight line from 'from' to 'to' (world px)
+    // does not pass through any solid tile.
+    bool hasLineOfSight(Vec2f from, Vec2f to) const;
+
 private:
     void buildVertices(const TilesetInfo& tileset);
 

@@ -1,6 +1,8 @@
 #include "engine/Tilemap/Tilemap.hpp"
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <cmath>
+#include <algorithm>
 
 namespace engine {
 
@@ -201,6 +203,61 @@ FloatRect Tilemap::worldBounds() const
     return {{0.f, 0.f},
             {static_cast<float>(m_cols * m_tileW),
              static_cast<float>(m_rows * m_tileH)}};
+}
+
+bool Tilemap::hasLineOfSight(Vec2f from, Vec2f to) const
+{
+    // DDA (Digital Differential Analyzer) grid traversal
+    float tileW = static_cast<float>(m_tileW);
+    float tileH = static_cast<float>(m_tileH);
+
+    int tx0 = static_cast<int>(from.x / tileW);
+    int ty0 = static_cast<int>(from.y / tileH);
+    int tx1 = static_cast<int>(to.x   / tileW);
+    int ty1 = static_cast<int>(to.y   / tileH);
+
+    int dx = tx1 - tx0;
+    int dy = ty1 - ty0;
+    int stepX = (dx > 0) ? 1 : (dx < 0 ? -1 : 0);
+    int stepY = (dy > 0) ? 1 : (dy < 0 ? -1 : 0);
+
+    float rayDirX = to.x - from.x;
+    float rayDirY = to.y - from.y;
+
+    float tDeltaX = (rayDirX != 0.f) ? std::abs(tileW / rayDirX) : 1e30f;
+    float tDeltaY = (rayDirY != 0.f) ? std::abs(tileH / rayDirY) : 1e30f;
+
+    float tMaxX, tMaxY;
+    if (stepX > 0)
+        tMaxX = ((tx0 + 1) * tileW - from.x) / rayDirX;
+    else if (stepX < 0)
+        tMaxX = (tx0 * tileW - from.x) / rayDirX;
+    else
+        tMaxX = 1e30f;
+
+    if (stepY > 0)
+        tMaxY = ((ty0 + 1) * tileH - from.y) / rayDirY;
+    else if (stepY < 0)
+        tMaxY = (ty0 * tileH - from.y) / rayDirY;
+    else
+        tMaxY = 1e30f;
+
+    int cx = tx0, cy = ty0;
+    int maxSteps = std::abs(dx) + std::abs(dy) + 2;
+
+    for (int i = 0; i < maxSteps; ++i) {
+        if (cx == tx1 && cy == ty1) break;
+        if (isSolid(cx, cy)) return false;
+
+        if (tMaxX < tMaxY) {
+            tMaxX += tDeltaX;
+            cx    += stepX;
+        } else {
+            tMaxY += tDeltaY;
+            cy    += stepY;
+        }
+    }
+    return !isSolid(tx1, ty1);
 }
 
 } // namespace engine

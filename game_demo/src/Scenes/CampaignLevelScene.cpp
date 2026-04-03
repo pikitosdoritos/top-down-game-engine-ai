@@ -70,6 +70,8 @@ void CampaignLevelScene::onEnter(engine::GameEngine& engine)
     try { res.loadTexture("player",    "assets/textures/player.png"); }  catch(...) {}
     try { res.loadTexture("enemy",     "assets/textures/enemy.png");  }  catch(...) {}
     try { res.loadTexture("brute",     "assets/textures/brute.png");  }  catch(...) {}
+    try { res.loadTexture("sword",     "assets/textures/sword.png");  }  catch(...) {}
+    try { res.loadTexture("bullet",    "assets/textures/bullet.png"); }  catch(...) {}
     try { res.loadTexture("current_tileset", "assets/textures/" + cfg.tilesetAsset + ".png"); } catch(...) {}
 
     buildMap(engine);
@@ -452,6 +454,9 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
         auto* ai = enemy->getComponent<AIComponent>();
         ai->moveSpeed   = cfg.gruntSpeed;
         ai->attackDamage = cfg.gruntDamage;
+        ai->hasLineOfSight = [this](Vec2f from, Vec2f to) {
+            return m_tilemap.hasLineOfSight(from, to);
+        };
         attachAttackCallback(*enemy, cfg.gruntDamage);
         m_entities.push_back(std::move(enemy));
     }
@@ -464,6 +469,12 @@ void CampaignLevelScene::spawnEnemies(engine::GameEngine& engine)
 
         auto brute = std::make_unique<Brute>(pos,
             cfg.bruteHP, cfg.bruteSpeed, cfg.bruteDamage, btex);
+        auto* bai = brute->getComponent<AIComponent>();
+        if (bai) {
+            bai->hasLineOfSight = [this](Vec2f from, Vec2f to) {
+                return m_tilemap.hasLineOfSight(from, to);
+            };
+        }
         attachAttackCallback(*brute, cfg.bruteDamage);
         m_entities.push_back(std::move(brute));
     }

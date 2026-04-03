@@ -17,6 +17,8 @@
 
 // Declared in GameOverScene.cpp — written here so GameScene can set it
 extern bool g_playerWon;
+extern int  g_killCount;
+extern int  g_totalEnemies;
 extern int g_difficulty;
 
 using namespace engine;
@@ -65,9 +67,11 @@ void GameScene::onEnter(engine::GameEngine& engine)
     const sf::Font& font = res.loadFont("main", "assets/fonts/Monocraft.ttf");
     
     // Load character textures gracefully (if they exist)
-    try { res.loadTexture("player", "assets/textures/player.png"); } catch(...) {}
-    try { res.loadTexture("enemy", "assets/textures/enemy.png"); } catch(...) {}
+    try { res.loadTexture("player",  "assets/textures/player.png");  } catch(...) {}
+    try { res.loadTexture("enemy",   "assets/textures/enemy.png");   } catch(...) {}
     try { res.loadTexture("tileset", "assets/textures/tileset.png"); } catch(...) {}
+    try { res.loadTexture("sword",   "assets/textures/sword.png");   } catch(...) {}
+    try { res.loadTexture("bullet",  "assets/textures/bullet.png");  } catch(...) {}
 
     // Build tilemap — procedural room, no texture required
     engine::TilesetInfo ts;
@@ -174,6 +178,9 @@ void GameScene::spawnEnemies(engine::GameEngine& engine)
         auto* ai = enemy->getComponent<AIComponent>();
         ai->moveSpeed = (g_difficulty == 0) ? 55.f : (g_difficulty == 1) ? 85.f : 130.f;
         ai->attackDamage = (g_difficulty == 0) ? 8.f : (g_difficulty == 1) ? 12.f : 20.f;
+        ai->hasLineOfSight = [this](Vec2f from, Vec2f to) {
+            return m_tilemap.hasLineOfSight(from, to);
+        };
         ai->behaviourUpdate = [rawPlayer, rawEnemy](
                 Entity& /*self*/, GameEngine& /*engine*/, float /*dt*/)
         {
@@ -198,7 +205,9 @@ void GameScene::update(engine::GameEngine& engine, float dt)
     if (m_playerDead || m_victory) {
         m_endTimer -= dt;
         if (m_endTimer <= 0.f) {
-            g_playerWon = m_victory;
+            g_playerWon    = m_victory;
+            g_killCount    = m_killCount;
+            g_totalEnemies = m_totalEnemies;
             engine.scenes().switchTo(SceneID::GameOver);
         }
         return;

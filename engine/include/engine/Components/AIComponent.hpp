@@ -22,6 +22,10 @@ public:
     // Assign custom logic per enemy type here.
     std::function<void(Entity& self, GameEngine& engine, float dt)> behaviourUpdate;
 
+    // Optional line-of-sight check. If set, Chase only activates when this returns true.
+    // Signature: (from, to) -> bool (true = clear line of sight)
+    std::function<bool(Vec2f from, Vec2f to)> hasLineOfSight;
+
     void update(Entity& owner, GameEngine& engine, float dt) override;
 
     AIState state         = AIState::Idle;
