@@ -45,10 +45,14 @@ public:
 
     FloatRect worldBounds() const;
 
-    int columns()    const { return m_cols; }
     int rows()       const { return m_rows; }
     int tileWidth()  const { return m_tileW; }
     int tileHeight() const { return m_tileH; }
+
+    bool isSolid(int tx, int ty) const {
+        if (tx < 0 || tx >= m_cols || ty < 0 || ty >= m_rows) return true;
+        return m_collision[ty * m_cols + tx] != 0;
+    }
 
 private:
     void buildVertices(const TilesetInfo& tileset);

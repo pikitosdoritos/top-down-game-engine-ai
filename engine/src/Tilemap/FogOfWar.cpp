@@ -97,4 +97,17 @@ void FogOfWar::draw(sf::RenderWindow& window) const
     window.draw(m_vertices);
 }
 
+bool FogOfWar::isVisible(Vec2f worldPos) const
+{
+    if (m_cols <= 0 || m_rows <= 0) return true; // fallback
+
+    int tx = static_cast<int>(worldPos.x / m_tileW);
+    int ty = static_cast<int>(worldPos.y / m_tileH);
+
+    if (tx < 0 || tx >= m_cols || ty < 0 || ty >= m_rows) 
+        return false;
+
+    return m_grid[ty * m_cols + tx] == TileVis::Visible;
+}
+
 } // namespace engine

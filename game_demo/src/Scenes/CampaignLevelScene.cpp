@@ -268,7 +268,6 @@ void CampaignLevelScene::handleTileCollisions()
 {
     for (auto& e : m_entities) {
         if (!e->active || e->destroyed) continue;
-        if (e->tag() == "projectile") continue;
 
         auto* tf  = e->getComponent<TransformComponent>();
         auto* col = e->getComponent<ColliderComponent>();
@@ -279,6 +278,11 @@ void CampaignLevelScene::handleTileCollisions()
         for (const auto& tile : m_tilemap.solidRects()) {
             auto ov = aabbOverlap(eBounds, tile);
             if (ov.x == 0.f && ov.y == 0.f) continue;
+
+            if (e->tag() == "projectile") {
+                e->destroyed = true;
+                break;
+            }
 
             if (ov.x < ov.y) {
                 float sign = (tf->position.x < tile.position.x + tile.size.x * 0.5f) ? -1.f : 1.f;
@@ -323,7 +327,15 @@ void CampaignLevelScene::render(engine::GameEngine& engine)
         float yb = tb ? tb->position.y : 0.f;
         return ya < yb;
     });
-    for (auto* e : drawList) e->render(*win);
+
+    for (auto* e : drawList) {
+        // Skip rendering non-player entities if hidden in Fog
+        if (e != m_player) {
+            auto* tf = e->getComponent<engine::TransformComponent>();
+            if (tf && !m_fog.isVisible(tf->position)) continue;
+        }
+        e->render(*win);
+    }
 
     // Melee swing arc
     if (m_player && m_player->isAttacking()) {
