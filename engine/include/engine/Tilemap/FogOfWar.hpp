@@ -32,7 +32,7 @@ public:
     sf::Color colExplored { 0,   0,   0,   160 };
 
 private:
-    void rebuildVertices();
+    void rebuildVertices() const;
 
     std::vector<TileVis> m_grid;
     int  m_cols  = 0;

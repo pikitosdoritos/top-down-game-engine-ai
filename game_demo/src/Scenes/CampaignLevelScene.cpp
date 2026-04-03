@@ -394,7 +394,7 @@ void CampaignLevelScene::spawnPlayer(engine::GameEngine& engine)
     m_entities.push_back(std::move(p));
 }
 
-void CampaignLevelScene::attachAttackCallback(engine::Entity& enemy, float damage)
+void CampaignLevelScene::attachAttackCallback(engine::Entity& enemy, float /*damage*/)
 {
     auto* ai = enemy.getComponent<AIComponent>();
     if (!ai || !m_player) return;
