@@ -1,98 +1,80 @@
-from PIL import Image, ImageDraw, ImageFilter
-import os, random
+"""
+Fast tileset generator using NumPy bulk operations.
+Creates 3 themed 32x128 tilesets (4 tiles stacked: floor, wall, corridor, pillar).
+Runtime: < 1 second.
+"""
+import numpy as np
+from PIL import Image
+import os
 
 os.makedirs('game_demo/assets/textures', exist_ok=True)
 
-def make_tileset(path, theme):
-    """
-    Creates a 32x128 tileset PNG with 4 tiles stacked vertically:
-      Row 0 (y=  0): floor
-      Row 1 (y= 32): wall
-      Row 2 (y= 64): corridor floor
-      Row 3 (y= 96): corridor wall / pillar
-    """
+def make_tileset(path, floor_rgb, wall_rgb, corridor_rgb):
+    rng = np.random.default_rng(hash(path) & 0xFFFFFFFF)
+
     W, H = 32, 128
-    img = Image.new('RGBA', (W, H), (0, 0, 0, 255))
-    draw = ImageDraw.Draw(img)
+    img = np.zeros((H, W, 4), dtype=np.uint8)
+    img[:, :, 3] = 255  # full alpha
 
-    fr, fg, fb = theme['floor']
-    wr, wg, wb = theme['wall']
-    cr, cg, cb = theme['corridor']
+    def noise(base, lo=-10, hi=10):
+        n = rng.integers(lo, hi, size=(32, 32), dtype=np.int16)
+        return np.clip(base + n, 0, 255).astype(np.uint8)
 
-    # ── TILE 0: Room floor ────────────────────────────────────────────────
+    # Tile 0: Room floor (y 0-31)
+    for i, c in enumerate(floor_rgb):
+        img[0:32, :, i] = noise(c, -8, 8)
+    # subtle grid lines
+    for k in range(0, 32, 8):
+        for i, c in enumerate(floor_rgb):
+            v = max(0, c - 20)
+            img[k,    :, i] = v
+            img[:, k,    i][0:32] = v  # only top tile rows
+
+    # Tile 1: Wall with brick pattern (y 32-63)
+    base_wall = np.zeros((32, 32, 3), dtype=np.uint8)
     for y in range(32):
+        row_idx = y // 8
+        offset = 0 if row_idx % 2 == 0 else 16
         for x in range(32):
-            noise = random.randint(-8, 8)
-            col = (max(0,min(255,fr+noise)), max(0,min(255,fg+noise)), max(0,min(255,fb+noise)), 255)
-            draw.point((x, y), fill=col)
-    # subtle grid crack lines
-    for i in range(0, 32, 8):
-        draw.line([(i, 0), (i, 31)], fill=(max(0,fr-18), max(0,fg-18), max(0,fb-18), 255))
-        draw.line([(0, i), (31, i)], fill=(max(0,fr-18), max(0,fg-18), max(0,fb-18), 255))
-
-    # ── TILE 1: Wall ─────────────────────────────────────────────────────
-    base_y = 32
-    for y in range(32):
-        for x in range(32):
-            # brick pattern
-            row = y // 8
-            offset = 0 if row % 2 == 0 else 16
-            is_mortar_h = (y % 8 == 0)
-            is_mortar_v = ((x + offset) % 16 == 0)
-            if is_mortar_h or is_mortar_v:
-                col = (max(0,wr-30), max(0,wg-30), max(0,wb-30), 255)
+            mortar_h = (y % 8 == 0)
+            mortar_v = ((x + offset) % 16 == 0)
+            if mortar_h or mortar_v:
+                for i, c in enumerate(wall_rgb):
+                    base_wall[y, x, i] = max(0, c - 32)
             else:
-                noise = random.randint(-10, 10)
-                col = (max(0,min(255,wr+noise)), max(0,min(255,wg+noise)), max(0,min(255,wb+noise)), 255)
-            draw.point((x, base_y + y), fill=col)
-    # top highlight
-    draw.line([(0, base_y), (31, base_y)], fill=(min(255,wr+60), min(255,wg+60), min(255,wb+60), 255))
+                for i, c in enumerate(wall_rgb):
+                    base_wall[y, x, i] = c
+    for i, c in enumerate(wall_rgb):
+        n = rng.integers(-10, 10, size=(32, 32), dtype=np.int16)
+        img[32:64, :, i] = np.clip(base_wall[:, :, i].astype(np.int16) + n, 0, 255).astype(np.uint8)
+    # highlight top row
+    for i, c in enumerate(wall_rgb):
+        img[32, :, i] = min(255, c + 60)
 
-    # ── TILE 2: Corridor floor ────────────────────────────────────────────
-    base_y = 64
-    cdr, cdg, cdb = max(0,cr-10), max(0,cg-10), max(0,cb-10)
-    for y in range(32):
-        for x in range(32):
-            noise = random.randint(-5, 5)
-            col = (max(0,min(255,cdr+noise)), max(0,min(255,cdg+noise)), max(0,min(255,cdb+noise)), 255)
-            draw.point((x, base_y + y), fill=col)
-    # subtle dotted pattern
-    for i in range(4, 32, 8):
-        for j in range(4, 32, 8):
-            draw.point((i, base_y+j), fill=(max(0,cdr-20), max(0,cdg-20), max(0,cdb-20), 255))
+    # Tile 2: Corridor floor (y 64-95)
+    for i, c in enumerate(corridor_rgb):
+        img[64:96, :, i] = noise(max(0, c - 8), -5, 5)
+    # dot pattern
+    for dy in range(4, 32, 8):
+        for dx in range(4, 32, 8):
+            for i, c in enumerate(corridor_rgb):
+                img[64 + dy, dx, i] = max(0, c - 22)
 
-    # ── TILE 3: Corridor wall / pillar ─────────────────────────────────────
-    base_y = 96
-    for y in range(32):
-        for x in range(32):
-            noise = random.randint(-6, 6)
-            col = (max(0,min(255,wr+noise-10)), max(0,min(255,wg+noise-10)), max(0,min(255,wb+noise-10)), 255)
-            draw.point((x, base_y + y), fill=col)
-    draw.line([(0, base_y), (31, base_y)], fill=(min(255,wr+40), min(255,wg+40), min(255,wb+40), 255))
+    # Tile 3: Corridor wall / pillar (y 96-127)
+    for i, c in enumerate(wall_rgb):
+        img[96:128, :, i] = noise(max(0, c - 12), -6, 6)
+    for i, c in enumerate(wall_rgb):
+        img[96, :, i] = min(255, c + 40)
 
-    img.save(path)
-    print(f"Saved {path}")
+    Image.fromarray(img, 'RGBA').save(path)
+    print(f"  Saved {path}")
 
 
-random.seed(42)
-make_tileset('game_demo/assets/textures/tileset_l1.png', {
-    'floor':    (52, 44, 32),   # warm stone
-    'wall':     (92, 70, 48),   # earthy brick
-    'corridor': (40, 35, 28),   # dark passage
-})
-
-random.seed(13)
-make_tileset('game_demo/assets/textures/tileset_l2.png', {
-    'floor':    (30, 32, 50),   # cold slate
-    'wall':     (60, 60, 90),   # blue-grey stone
-    'corridor': (22, 24, 40),   # deep crypt
-})
-
-random.seed(77)
-make_tileset('game_demo/assets/textures/tileset_l3.png', {
-    'floor':    (48, 14, 14),   # blood stone
-    'wall':     (90, 22, 22),   # dark red brick
-    'corridor': (35, 8,  8),    # abyss passage
-})
-
-print("All tilesets generated.")
+print("Generating tilesets...")
+make_tileset('game_demo/assets/textures/tileset_l1.png',
+             floor_rgb=(52, 44, 32), wall_rgb=(92, 70, 48), corridor_rgb=(40, 35, 28))
+make_tileset('game_demo/assets/textures/tileset_l2.png',
+             floor_rgb=(30, 32, 50), wall_rgb=(60, 60, 90), corridor_rgb=(22, 24, 40))
+make_tileset('game_demo/assets/textures/tileset_l3.png',
+             floor_rgb=(48, 14, 14), wall_rgb=(90, 22, 22), corridor_rgb=(35, 8, 8))
+print("Done.")
