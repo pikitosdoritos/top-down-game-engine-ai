@@ -48,6 +48,17 @@ void GameEngine::processEvents()
             quit();
             return;
         }
+
+        if (const auto* kp = event->getIf<sf::Event::KeyPressed>()) {
+            if (kp->code == sf::Keyboard::Key::F11) {
+                m_config.fullscreen = !m_config.fullscreen;
+                m_window.create(m_config.windowWidth, m_config.windowHeight,
+                                m_config.title, m_config.vsync, m_config.fullscreen);
+                m_renderer.init(m_window.sfWindow());
+                continue; // Do not pass F11 down
+            }
+        }
+
         m_input.handleEvent(*event);
         m_scenes.handleEvent(*this, *event);
     }

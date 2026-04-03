@@ -131,15 +131,6 @@ void CampaignLevelScene::handleEvent(engine::GameEngine& engine, const sf::Event
     if (const auto* kp = event.getIf<sf::Event::KeyPressed>()) {
         if (kp->code == sf::Keyboard::Key::Escape)
             engine.quit();
-        if (kp->code == sf::Keyboard::Key::F11) {
-            static bool fs = false;
-            fs = !fs;
-            auto& w = engine.window();
-            w.create(w.width(), w.height(), "Dungeon of Despair", true, fs);
-            engine.renderer().init(w.sfWindow());
-            m_camera.setViewSize({static_cast<float>(w.width()),
-                                  static_cast<float>(w.height())});
-        }
     }
 }
 

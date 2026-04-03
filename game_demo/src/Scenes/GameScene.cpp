@@ -23,17 +23,29 @@ using namespace engine;
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-static Vec2f overlap(const FloatRect& a, const FloatRect& b)
+static Vec2f aabbOverlap(const FloatRect& a, const FloatRect& b)
 {
-    float ax1 = a.position.x, ay1 = a.position.y;
-    float ax2 = ax1 + a.size.x, ay2 = ay1 + a.size.y;
-    float bx1 = b.position.x, by1 = b.position.y;
-    float bx2 = bx1 + b.size.x, by2 = by1 + b.size.y;
-
-    float ox = std::min(ax2, bx2) - std::max(ax1, bx1);
-    float oy = std::min(ay2, by2) - std::max(ay1, by1);
+    float ox = std::min(a.position.x + a.size.x, b.position.x + b.size.x)
+             - std::max(a.position.x, b.position.x);
+    float oy = std::min(a.position.y + a.size.y, b.position.y + b.size.y)
+             - std::max(a.position.y, b.position.y);
     if (ox <= 0.f || oy <= 0.f) return {0.f, 0.f};
     return {ox, oy};
+}
+
+// Generates a pseudorandom spawn point safely inside the map bounds on a floor tile.
+static Vec2f safeSpawn(const Tilemap& tm, int cols, int rows, int tileSize, int seed)
+{
+    srand(static_cast<unsigned>(seed * 7919 + 1337));
+    int x = 0, y = 0;
+    int tries = 0;
+    while (tries < 100) {
+        x = rand() % cols;
+        y = rand() % rows;
+        if (!tm.isSolid(x, y)) break;
+        tries++;
+    }
+    return {(x + 0.5f) * tileSize, (y + 0.5f) * tileSize};
 }
 
 // ── Scene lifecycle ───────────────────────────────────────────────────────────
@@ -135,7 +147,7 @@ void GameScene::spawnPlayer(engine::GameEngine& engine)
     m_player = p.get();
 
     auto* tf = m_player->getComponent<TransformComponent>();
-    if (tf) tf->position = {3 * 32.f + 16.f, 3 * 32.f + 16.f}; // near top-left inside walls
+    if (tf) tf->position = safeSpawn(m_tilemap, m_tilemap.columns(), m_tilemap.rows(), 32, 12345);
 
     m_entities.push_back(std::move(p));
 }
@@ -144,21 +156,14 @@ void GameScene::spawnEnemies(engine::GameEngine& engine)
 {
     const sf::Texture* etex = engine.resources().getTexture("enemy");
 
-    std::vector<engine::Vec2f> spawnPoints;
     int count = (g_difficulty == 0) ? 4 : (g_difficulty == 1) ? 8 : 18;
+    float hpBonus = (g_difficulty == 0) ? 40.f : (g_difficulty == 1) ? 60.f : 100.f;
     
     for (int i = 0; i < count; ++i) {
-        float px = 32.f * (5.f + (rand() % std::max(1, (m_tilemap.columns() - 10))));
-        float py = 32.f * (5.f + (rand() % std::max(1, (m_tilemap.rows() - 10))));
-        spawnPoints.push_back({px, py});
-    }
+        Vec2f pos = safeSpawn(m_tilemap, m_tilemap.columns(), m_tilemap.rows(), 32,
+                               i * 31 + g_difficulty * 5000);
 
-    float hp = (g_difficulty == 0) ? 40.f : (g_difficulty == 1) ? 60.f : 100.f;
-    float spd = (g_difficulty == 0) ? 55.f : (g_difficulty == 1) ? 85.f : 130.f;
-    float dmg = (g_difficulty == 0) ? 8.f : (g_difficulty == 1) ? 12.f : 20.f;
-
-    for (const auto& pos : spawnPoints) {
-        auto enemy = std::make_unique<Enemy>(pos, hp, etex);
+        auto enemy = std::make_unique<Enemy>(pos, hpBonus, etex);
 
         // Give each enemy its attack callback via AIComponent.behaviourUpdate
         // Capture m_player as raw pointer — valid for lifetime of GameScene
@@ -166,8 +171,8 @@ void GameScene::spawnEnemies(engine::GameEngine& engine)
         Player* rawPlayer = m_player;
 
         auto* ai = enemy->getComponent<AIComponent>();
-        ai->moveSpeed = spd;
-        ai->attackDamage = dmg;
+        ai->moveSpeed = (g_difficulty == 0) ? 55.f : (g_difficulty == 1) ? 85.f : 130.f;
+        ai->attackDamage = (g_difficulty == 0) ? 8.f : (g_difficulty == 1) ? 12.f : 20.f;
         ai->behaviourUpdate = [rawPlayer, rawEnemy](
                 Entity& /*self*/, GameEngine& /*engine*/, float /*dt*/)
         {
@@ -237,7 +242,7 @@ void GameScene::update(engine::GameEngine& engine, float dt)
             auto* ecol = e->getComponent<ColliderComponent>();
             if (!etf || !ecol) continue;
             FloatRect eb = ecol->worldBounds(etf->position);
-            auto ov = overlap(hit, eb);
+            auto ov = aabbOverlap(hit, eb);
             if (ov.x > 0.f && ov.y > 0.f) {
                 if (auto* hp = e->getComponent<HealthComponent>())
                     hp->takeDamage(m_player->attackDamage);
@@ -300,7 +305,6 @@ void GameScene::handleTileCollisions()
 
     for (auto& e : m_entities) {
         if (!e->active || e->destroyed) continue;
-        if (e->tag() == "projectile")  continue; // projectiles pass through walls in this demo
 
         auto* tf  = e->getComponent<TransformComponent>();
         auto* col = e->getComponent<ColliderComponent>();
@@ -309,10 +313,15 @@ void GameScene::handleTileCollisions()
         FloatRect eBounds = col->worldBounds(tf->position);
 
         for (const auto& tile : solidRects) {
-            auto ov = overlap(eBounds, tile);
+            auto ov = aabbOverlap(eBounds, tile);
             if (ov.x == 0.f && ov.y == 0.f) continue;
 
             // Push along axis of least penetration
+            if (e->tag() == "projectile") {
+                e->destroyed = true;
+                break;
+            }
+
             if (ov.x < ov.y) {
                 float sign = (tf->position.x < tile.position.x + tile.size.x * 0.5f) ? -1.f : 1.f;
                 tf->position.x += sign * ov.x;
@@ -320,10 +329,16 @@ void GameScene::handleTileCollisions()
                 float sign = (tf->position.y < tile.position.y + tile.size.y * 0.5f) ? -1.f : 1.f;
                 tf->position.y += sign * ov.y;
             }
-
-            // Recompute after push
             eBounds = col->worldBounds(tf->position);
         }
+
+        // Clamp to map bounds perfectly
+        float mapW = m_tilemap.columns() * 32.f;
+        float mapH = m_tilemap.rows() * 32.f;
+        if (tf->position.x < 16.f) tf->position.x = 16.f;
+        if (tf->position.y < 16.f) tf->position.y = 16.f;
+        if (tf->position.x > mapW - 16.f) tf->position.x = mapW - 16.f;
+        if (tf->position.y > mapH - 16.f) tf->position.y = mapH - 16.f;
     }
 }
 
