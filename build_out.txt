@@ -1,0 +1,44 @@
+[1/2] Building CXX object game_demo/CMakeFiles/game_demo.dir/src/Scenes/CampaignLevelScene.cpp.obj
+FAILED: [code=1] game_demo/CMakeFiles/game_demo.dir/src/Scenes/CampaignLevelScene.cpp.obj 
+C:\msys64\mingw64\bin\g++.exe  -IE:/projects/top-down-game-engine-ai/game_demo/src -IE:/projects/top-down-game-engine-ai/engine/include -IE:/projects/top-down-game-engine-ai/third_party -g -std=c++17 -Wall -Wextra -Wpedantic -MD -MT game_demo/CMakeFiles/game_demo.dir/src/Scenes/CampaignLevelScene.cpp.obj -MF game_demo\CMakeFiles\game_demo.dir\src\Scenes\CampaignLevelScene.cpp.obj.d -o game_demo/CMakeFiles/game_demo.dir/src/Scenes/CampaignLevelScene.cpp.obj -c E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp
+In file included from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp:1:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp: In member function 'virtual void engine::IScene::handleEvent(engine::GameEngine&, const sf::Event&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:50: warning: unused parameter 'engine' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                              ~~~~~~~~~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Scene/IScene.hpp:17:75: warning: unused parameter 'event' [-Wunused-parameter]
+   17 |     virtual void handleEvent(engine::GameEngine& engine, const sf::Event& event) {}
+      |                                                          ~~~~~~~~~~~~~~~~~^~~~~
+In file included from E:/projects/top-down-game-engine-ai/engine/include/engine/Components/VelocityComponent.hpp:2,
+                 from E:/projects/top-down-game-engine-ai/engine/include/engine/Collision/CollisionSystem.hpp:3,
+                 from E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.hpp:6:
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::onAttach(engine::Entity&)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:13:35: warning: unused parameter 'owner' [-Wunused-parameter]
+   13 |     virtual void onAttach(Entity& owner) {}
+      |                           ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp: In member function 'virtual void engine::Component::update(engine::Entity&, engine::GameEngine&, float)':
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:33: warning: unused parameter 'owner' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                         ~~~~~~~~^~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:52: warning: unused parameter 'engine' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                        ~~~~~~~~~~~~^~~~~~
+E:/projects/top-down-game-engine-ai/engine/include/engine/Entity/Component.hpp:14:66: warning: unused parameter 'dt' [-Wunused-parameter]
+   14 |     virtual void update(Entity& owner, GameEngine& engine, float dt) {}
+      |                                                            ~~~~~~^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp: In member function 'virtual void CampaignLevelScene::onEnter(engine::GameEngine&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp:65:24: error: redeclaration of 'const LevelConfig& cfg'
+   65 |     const LevelConfig& cfg = CampaignState::current();
+      |                        ^~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp:50:24: note: 'const LevelConfig& cfg' previously declared here
+   50 |     const LevelConfig& cfg = CampaignState::current();
+      |                        ^~~
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp: In member function 'void CampaignLevelScene::spawnPlayer(engine::GameEngine&)':
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp:399:21: warning: unused variable 'tx' [-Wunused-variable]
+  399 |                 int tx = static_cast<int>(px / cfg.tileSize);
+      |                     ^~
+E:/projects/top-down-game-engine-ai/game_demo/src/Scenes/CampaignLevelScene.cpp:400:21: warning: unused variable 'ty' [-Wunused-variable]
+  400 |                 int ty = static_cast<int>(py / cfg.tileSize);
+      |                     ^~
+ninja: build stopped: subcommand failed.

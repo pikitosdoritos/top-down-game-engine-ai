@@ -27,6 +27,9 @@ public:
     void reveal(Vec2f worldPos, float radius);   // call each frame with player pos
     void draw(sf::RenderWindow& window) const;
 
+    // Check if a world position is currently revealed
+    bool isVisible(Vec2f worldPos) const;
+
     // Colours
     sf::Color colHidden   { 0,   0,   0,   255 };
     sf::Color colExplored { 0,   0,   0,   160 };

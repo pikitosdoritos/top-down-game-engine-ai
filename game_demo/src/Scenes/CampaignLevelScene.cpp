@@ -62,7 +62,7 @@ void CampaignLevelScene::onEnter(engine::GameEngine& engine)
     auto& res = engine.resources();
     const sf::Font& font = res.loadFont("main", "assets/fonts/Monocraft.ttf");
 
-    const LevelConfig& cfg = CampaignState::current();
+    // Textures — load if available, fail silently
     try { res.loadTexture("player",    "assets/textures/player.png"); }  catch(...) {}
     try { res.loadTexture("enemy",     "assets/textures/enemy.png");  }  catch(...) {}
     try { res.loadTexture("brute",     "assets/textures/brute.png");  }  catch(...) {}
